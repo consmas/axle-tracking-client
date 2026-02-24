@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="640" height="120" viewBox="0 0 640 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Axle Tracking CMS — Full Lockup -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@800&amp;display=swap');
+    .brand { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 42px; }
+    .sub { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: 4px; }
+  </style>
+
+  <!-- Logomark (scaled down) -->
+  <g transform="translate(55, 56) scale(0.48)">
+    <circle r="130" stroke="#00E676" stroke-width="3" opacity="0.15"/>
+    <circle r="85" stroke="#00E676" stroke-width="3" opacity="0.25"/>
+    <circle r="46" stroke="#00E676" stroke-width="3" opacity="0.35"/>
+    <line x1="0" y1="-78" x2="0" y2="-42" stroke="#00E676" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
+    <line x1="67.5" y1="39" x2="36.5" y2="21" stroke="#00E676" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
+    <line x1="-67.5" y1="39" x2="-36.5" y2="21" stroke="#00E676" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
+    <circle r="25" fill="#0D1B2A" stroke="#00E676" stroke-width="3" opacity="0.7"/>
+    <path d="M0 -16 L10 12 L0 6 L-10 12 Z" fill="#00E676"/>
+    <path d="M56 -40 A66 66 0 0 1 72 0" stroke="#00E676" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+    <path d="M65 -52 A84 84 0 0 1 92 0" stroke="#00E676" stroke-width="3" stroke-linecap="round" opacity="0.35"/>
+    <circle cx="72" cy="0" r="5" fill="#00E676" opacity="0.8"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="122" y="52" class="brand" fill="#F0F2F5">AXLE</text>
+  <text x="245" y="52" class="brand" fill="#00E676">TRACKING</text>
+  <text x="122" y="76" class="sub" fill="#555F73">FLEET INTELLIGENCE</text>
+</svg>

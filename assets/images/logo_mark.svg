@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Axle Tracking CMS — Primary Logomark -->
+
+  <!-- Outer orbit ring -->
+  <circle cx="256" cy="250" r="200" stroke="#00E676" stroke-width="2.5" opacity="0.15"/>
+
+  <!-- Wheel ring -->
+  <circle cx="256" cy="250" r="130" stroke="#00E676" stroke-width="3.5" opacity="0.25"/>
+
+  <!-- Inner wheel ring -->
+  <circle cx="256" cy="250" r="72" stroke="#00E676" stroke-width="3.5" opacity="0.35"/>
+
+  <!-- Spoke: Top (270°) -->
+  <line x1="256" y1="128" x2="256" y2="182" stroke="#00E676" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
+
+  <!-- Spoke: Bottom-Right (30°) -->
+  <line x1="319" y1="313" x2="289" y2="296" stroke="#00E676" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
+
+  <!-- Spoke: Bottom-Left (150°) -->
+  <line x1="193" y1="313" x2="223" y2="296" stroke="#00E676" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
+
+  <!-- Hub circle -->
+  <circle cx="256" cy="250" r="38" fill="#0D1B2A" stroke="#00E676" stroke-width="3.5" opacity="0.7"/>
+
+  <!-- Navigation arrow -->
+  <path d="M256 222 L272 260 L256 252 L240 260 Z" fill="#00E676"/>
+
+  <!-- Signal arc 1 (closest) -->
+  <path d="M324 186 A88 88 0 0 1 354 250" stroke="#00E676" stroke-width="4.5" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Signal arc 2 -->
+  <path d="M338 168 A112 112 0 0 1 378 250" stroke="#00E676" stroke-width="3.5" stroke-linecap="round" opacity="0.35"/>
+
+  <!-- Signal arc 3 (farthest) -->
+  <path d="M352 150 A136 136 0 0 1 402 250" stroke="#00E676" stroke-width="2.5" stroke-linecap="round" opacity="0.18"/>
+
+  <!-- Tracking pulse dot -->
+  <circle cx="354" cy="250" r="8" fill="#00E676" opacity="0.85">
+    <animate attributeName="opacity" values="0.85;0.3;0.85" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="354" cy="250" r="8" fill="none" stroke="#00E676" stroke-width="2" opacity="0.3">
+    <animate attributeName="r" values="8;20;8" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>

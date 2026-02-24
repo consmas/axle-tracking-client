@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Axle Tracking CMS — Mobile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: #07090D; }
+    body { display: flex; align-items: center; justify-content: center; }
+    #root {
+      width: 100%;
+      max-width: 430px;
+      height: 100dvh;
+      max-height: 932px;
+      position: relative;
+      overflow: hidden;
+      background: #0B0E14;
+    }
+    @media (min-width: 480px) {
+      body { padding: 20px 0; }
+      #root {
+        height: calc(100dvh - 40px);
+        border-radius: 44px;
+        box-shadow: 0 0 0 12px #1A1F2E, 0 40px 80px rgba(0,0,0,0.7), 0 0 100px rgba(0,230,118,0.04);
+      }
+    }
+    ::-webkit-scrollbar { width: 0; }
+    input, button, textarea { -webkit-tap-highlight-color: transparent; }
+    @keyframes spin { to { transform: rotate(360deg) } }
+    @keyframes pulse { 0%,100% { transform:scale(1);opacity:1 } 50% { transform:scale(1.15);opacity:0.7 } }
+    @keyframes blink { 0%,100% { opacity:1 } 50% { opacity:0.3 } }
+    @keyframes slideUp { from { transform:translateY(20px);opacity:0 } to { transform:translateY(0);opacity:1 } }
+    @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+    @keyframes scanline {
+      0% { transform: translateY(-100%) }
+      100% { transform: translateY(100vh) }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    // ─── DESIGN TOKENS ────────────────────────────────────────────────────────
+    const C = {
+      bg:           "#0B0E14",
+      bgCard:       "#131820",
+      bgElevated:   "#161D2A",
+      bgOverlay:    "rgba(11,14,20,0.88)",
+      navy:         "#0D1B2A",
+      navyLight:    "#1B2838",
+      accent:       "#00E676",
+      accentDim:    "rgba(0,230,118,0.12)",
+      accentGlow:   "rgba(0,230,118,0.3)",
+      warning:      "#FFB300",
+      warningDim:   "rgba(255,179,0,0.12)",
+      critical:     "#FF3D3D",
+      criticalDim:  "rgba(255,61,61,0.12)",
+      info:         "#4FC3F7",
+      infoDim:      "rgba(79,195,247,0.12)",
+      textPrimary:  "#F0F2F5",
+      textSecondary:"#8892A4",
+      textMuted:    "#555F73",
+      border:       "rgba(255,255,255,0.06)",
+      borderLight:  "rgba(255,255,255,0.10)",
+      offline:      "#555F73",
+      purple:       "#7C6BF8",
+    };
+
+    const font     = `'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif`;
+    const fontMono = `'JetBrains Mono', 'SF Mono', monospace`;
+
+    const card = {
+      background: `linear-gradient(135deg, ${C.bgCard}, ${C.bgElevated})`,
+      border: `1px solid ${C.border}`,
+      borderRadius: 16,
+    };
+
+    const glow = (color) => `0 0 20px ${color}40, 0 4px 16px rgba(0,0,0,0.3)`;
+
+    // ─── ICONS ────────────────────────────────────────────────────────────────
+    const IC = {
+      Back:   () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>,
+      Home:   () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>,
+      Grid:   () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>,
+      Bell:   () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>,
+      User:   () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg>,
+      Truck:  () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 17h14M5 17a2 2 0 01-2-2V8a2 2 0 012-2h2l2-3h6l2 3h2a2 2 0 012 2v7a2 2 0 01-2 2M5 17l-1 3m15-3l1 3"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>,
+      Map:    () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21c-4-4-8-7.5-8-11a8 8 0 1116 0c0 3.5-4 7-8 11z"/><circle cx="12" cy="10" r="3"/></svg>,
+      Play:   () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 3l14 9-14 9V3z"/></svg>,
+      Video:  () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="14" height="14" rx="2"/><path d="M16 10l6-3v10l-6-3"/></svg>,
+      Search: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>,
+      Speed:  () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M12 6v6l4 2"/></svg>,
+      Signal: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="10" width="2" height="10" rx="1"/><rect x="7" y="7" width="2" height="13" rx="1"/><rect x="12" y="4" width="2" height="16" rx="1"/><rect x="17" y="7" width="2" height="13" rx="1"/><rect x="22" y="10" width="2" height="10" rx="1"/></svg>,
+      Chevron:() => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>,
+      Eye:    () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
+      Calendar:()=> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>,
+      Dot:    () => <svg width="9" height="9" viewBox="0 0 9 9"><circle cx="4.5" cy="4.5" r="4.5" fill={C.critical}/></svg>,
+      Shield: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l7 3v7c0 5-7 10-7 10S5 17 5 12V5l7-3z"/></svg>,
+      Settings:()=><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>,
+      Logout: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>,
+      Fuel:   () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M3 22V6a2 2 0 012-2h7a2 2 0 012 2v16M3 22h13M13 8h2a2 2 0 012 2v3a2 2 0 002 2v0a2 2 0 002-2V9.5L18 7"/></svg>,
+      Command:() => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M4 12h16M12 4v16"/></svg>,
+    };
+
+    // ─── MOCK DATA ────────────────────────────────────────────────────────────
+    const vehicles = [
+      { id:1, name:"Truck Alpha-01", plate:"KA 12 AB 3456", online:true,  speed:62, lat:12.97, lng:77.59, lastUpdate:"Just now",   driver:"M. Hassan", fuel:78, route:"NH-48" },
+      { id:2, name:"Van Bravo-07",   plate:"MH 02 CD 7890", online:true,  speed:45, lat:19.07, lng:72.87, lastUpdate:"2m ago",      driver:"R. Singh",  fuel:54, route:"Western Express" },
+      { id:3, name:"Sedan Charlie",  plate:"DL 04 EF 1234", online:false, speed:0,  lat:28.61, lng:77.20, lastUpdate:"3h ago",      driver:"A. Patel",  fuel:32, route:"Ring Road" },
+      { id:4, name:"Truck Delta-03", plate:"TN 09 GH 5678", online:true,  speed:78, lat:13.08, lng:80.27, lastUpdate:"Just now",   driver:"V. Kumar",  fuel:91, route:"ECR" },
+      { id:5, name:"Bus Echo-19",    plate:"GJ 06 IJ 9012", online:true,  speed:38, lat:23.02, lng:72.57, lastUpdate:"1m ago",      driver:"S. Mehta",  fuel:65, route:"SG Highway" },
+      { id:6, name:"Truck Foxtrot",  plate:"RJ 14 KL 3456", online:false, speed:0,  lat:26.91, lng:75.78, lastUpdate:"1d ago",      driver:"K. Sharma", fuel:12, route:"MI Road" },
+      { id:7, name:"Van Golf-15",    plate:"UP 32 MN 7890", online:true,  speed:55, lat:26.84, lng:80.94, lastUpdate:"Just now",   driver:"P. Yadav",  fuel:44, route:"NH-27" },
+      { id:8, name:"Sedan Hotel",    plate:"WB 06 OP 1234", online:false, speed:0,  lat:22.57, lng:88.36, lastUpdate:"5h ago",      driver:"D. Das",    fuel:8,  route:"Park Street" },
+    ];
+
+    const alarms = [
+      { id:1, type:"Overspeed",     vehicle:"Truck Alpha-01",  severity:"critical", time:"2 min ago",  speed:"112 km/h", location:"NH-48, Gujarat" },
+      { id:2, type:"Geofence Exit", vehicle:"Van Bravo-07",    severity:"warning",  time:"15 min ago", speed:"45 km/h",  location:"Andheri, Mumbai" },
+      { id:3, type:"SOS Alert",     vehicle:"Truck Delta-03",  severity:"critical", time:"28 min ago", speed:"0 km/h",   location:"ECR, Chennai" },
+      { id:4, type:"Low Battery",   vehicle:"Sedan Charlie",   severity:"warning",  time:"1h ago",     speed:"0 km/h",   location:"CP, New Delhi" },
+      { id:5, type:"Harsh Braking", vehicle:"Bus Echo-19",     severity:"info",     time:"2h ago",     speed:"38 km/h",  location:"SG Highway, Ahmedabad" },
+      { id:6, type:"Camera Offline",vehicle:"Truck Foxtrot",   severity:"warning",  time:"3h ago",     speed:"0 km/h",   location:"MI Road, Jaipur" },
+    ];
+
+    // ─── SPLASH ───────────────────────────────────────────────────────────────
+    function SplashScreen({ onFinish }) {
+      const [phase, setPhase] = useState(0);
+      useEffect(() => {
+        const t1 = setTimeout(() => setPhase(1), 300);
+        const t2 = setTimeout(() => setPhase(2), 1400);
+        const t3 = setTimeout(() => onFinish(), 2800);
+        return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+      }, []);
+      return (
+        <div style={{
+          position:"absolute", inset:0, display:"flex", flexDirection:"column",
+          alignItems:"center", justifyContent:"center",
+          background:`radial-gradient(ellipse at 50% 40%, #122030, ${C.bg})`,
+          zIndex:100, opacity: phase===2 ? 0 : 1, transition:"opacity 0.8s ease",
+        }}>
+          {/* Glow rings */}
+          <div style={{ position:"relative", width:130, height:130 }}>
+            {[0,1,2].map(i => (
+              <div key={i} style={{
+                position:"absolute", inset:`${i*14}px`,
+                border:`1.5px solid ${C.accent}${i===0?"50":i===1?"28":"14"}`,
+                borderRadius:"50%",
+                opacity: phase>=1 ? 1 : 0,
+                transform: phase>=1 ? "scale(1)" : "scale(0.4)",
+                transition:`all 0.6s cubic-bezier(0.34,1.56,0.64,1) ${i*0.12}s`,
+              }}/>
+            ))}
+            <div style={{
+              position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center",
+              opacity: phase>=1?1:0, transform: phase>=1?"scale(1)":"scale(0.6)",
+              transition:"all 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.25s",
+            }}>
+              <div style={{
+                width:52, height:52, borderRadius:14,
+                background:`linear-gradient(135deg, ${C.accent}, #00C853)`,
+                display:"flex", alignItems:"center", justifyContent:"center",
+                boxShadow: glow(C.accent),
+              }}>
+                <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
+                  <path d="M10 30V14l10-9 10 9V30H22v-9h-4v9H10z" fill={C.bg}/>
+                  <circle cx="20" cy="17" r="3" fill={C.accent}/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div style={{
+            marginTop:28, textAlign:"center",
+            opacity: phase>=1?1:0, transform: phase>=1?"translateY(0)":"translateY(18px)",
+            transition:"all 0.6s ease 0.45s",
+          }}>
+            <div style={{ fontFamily:font, fontWeight:700, fontSize:28, color:C.textPrimary, letterSpacing:"-0.5px" }}>
+              AXLE<span style={{color:C.accent}}>TRACKING</span>
+            </div>
+            <div style={{ fontFamily:font, fontSize:11, color:C.textSecondary, letterSpacing:4, marginTop:7, textTransform:"uppercase" }}>
+              Fleet Intelligence
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          <div style={{
+            position:"absolute", bottom:72, width:150, height:2.5, borderRadius:2,
+            background:C.border, overflow:"hidden",
+            opacity: phase>=1?1:0, transition:"opacity 0.3s ease 0.6s",
+          }}>
+            <div style={{
+              height:"100%", borderRadius:2,
+              background:`linear-gradient(90deg, ${C.accent}, #00C853)`,
+              width: phase>=1?"100%":"0%", transition:"width 1.6s ease 0.7s",
+            }}/>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── LOGIN ────────────────────────────────────────────────────────────────
+    function LoginScreen({ onLogin }) {
+      const [email, setEmail] = useState("admin@axlefleet.com");
+      const [pass, setPass] = useState("••••••••");
+      const [focused, setFocused] = useState(null);
+      const [loading, setLoading] = useState(false);
+
+      const handleLogin = () => {
+        setLoading(true);
+        setTimeout(() => onLogin(), 1000);
+      };
+
+      const Field = ({ id, label, value, onChange, type="text", placeholder }) => (
+        <div style={{ marginBottom:18 }}>
+          <label style={{ fontFamily:font, fontSize:11, fontWeight:600, color:C.textSecondary, display:"block", marginBottom:8, letterSpacing:0.8, textTransform:"uppercase" }}>
+            {label}
+          </label>
+          <div style={{
+            ...card, borderRadius:13, padding:"14px 16px",
+            borderColor: focused===id ? C.accent+"60" : C.border,
+            boxShadow: focused===id ? `0 0 0 3px ${C.accent}18` : "none",
+            transition:"all 0.2s ease",
+          }}>
+            <input value={value} onChange={e=>onChange(e.target.value)} type={type}
+              placeholder={placeholder}
+              onFocus={()=>setFocused(id)} onBlur={()=>setFocused(null)}
+              style={{ background:"none", border:"none", outline:"none", width:"100%",
+                fontFamily:font, fontSize:15, color:C.textPrimary }}
+            />
+          </div>
+        </div>
+      );
+
+      return (
+        <div style={{
+          height:"100%", display:"flex", flexDirection:"column", justifyContent:"center",
+          padding:"40px 28px",
+          background:`radial-gradient(ellipse at 25% 15%, rgba(0,230,118,0.04), transparent 60%), ${C.bg}`,
+          position:"relative", overflow:"hidden",
+        }}>
+          {/* Subtle grid */}
+          <div style={{
+            position:"absolute", inset:0, opacity:0.025,
+            backgroundImage:`linear-gradient(${C.accent} 1px, transparent 1px), linear-gradient(90deg, ${C.accent} 1px, transparent 1px)`,
+            backgroundSize:"44px 44px",
+          }}/>
+
+          <div style={{ position:"relative", zIndex:1, animation:"slideUp 0.6s ease" }}>
+            {/* Logo */}
+            <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:52 }}>
+              <div style={{
+                width:46, height:46, borderRadius:13,
+                background:`linear-gradient(135deg, ${C.accent}, #00C853)`,
+                display:"flex", alignItems:"center", justifyContent:"center",
+                boxShadow: glow(C.accent),
+              }}>
+                <svg width="26" height="26" viewBox="0 0 40 40" fill="none">
+                  <path d="M10 30V14l10-9 10 9V30H22v-9h-4v9H10z" fill={C.bg}/>
+                </svg>
+              </div>
+              <div>
+                <div style={{ fontFamily:font, fontWeight:700, fontSize:21, color:C.textPrimary }}>
+                  AXLE<span style={{color:C.accent}}>TRACKING</span>
+                </div>
+                <div style={{ fontFamily:font, fontSize:11, color:C.textMuted, letterSpacing:1.5, textTransform:"uppercase" }}>CMS Portal</div>
+              </div>
+            </div>
+
+            <div style={{ fontFamily:font, fontSize:30, fontWeight:700, color:C.textPrimary, marginBottom:6, lineHeight:1.2 }}>
+              Welcome back
+            </div>
+            <div style={{ fontFamily:font, fontSize:14, color:C.textSecondary, marginBottom:38 }}>
+              Sign in to your fleet dashboard
+            </div>
+
+            <Field id="email" label="Email Address" value={email} onChange={setEmail} placeholder="name@company.com" />
+            <Field id="pass"  label="Password"      value={pass}  onChange={setPass}  type="password" placeholder="Your password" />
+
+            <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:32 }}>
+              <span style={{ fontFamily:font, fontSize:13, color:C.accent, fontWeight:500, cursor:"pointer" }}>Forgot password?</span>
+            </div>
+
+            <button onClick={handleLogin} style={{
+              width:"100%", padding:"16px", border:"none", borderRadius:14, cursor:"pointer",
+              background: loading ? C.accent+"80" : `linear-gradient(135deg, ${C.accent}, #00C853)`,
+              fontFamily:font, fontSize:16, fontWeight:700, color:C.bg,
+              boxShadow: glow(C.accent), transition:"all 0.2s ease",
+              display:"flex", alignItems:"center", justifyContent:"center", gap:8,
+            }}>
+              {loading
+                ? <div style={{ width:22, height:22, border:`2.5px solid ${C.bg}40`, borderTopColor:C.bg, borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/>
+                : "Sign In"
+              }
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── NAV BAR ─────────────────────────────────────────────────────────────
+    function NavBar({ active, onChange }) {
+      const tabs = [
+        { key:"dashboard", icon:<IC.Home/>,  label:"Home" },
+        { key:"vehicles",  icon:<IC.Grid/>,  label:"Fleet" },
+        { key:"alarms",    icon:<IC.Bell/>,  label:"Alarms" },
+        { key:"profile",   icon:<IC.User/>,  label:"Profile" },
+      ];
+      const unreadAlarms = alarms.filter(a=>a.severity==="critical").length;
+      return (
+        <div style={{
+          display:"flex", justifyContent:"space-around",
+          padding:"8px 0 max(12px, env(safe-area-inset-bottom))",
+          background:`linear-gradient(to top, ${C.bg}, ${C.bg}F8)`,
+          borderTop:`1px solid ${C.border}`,
+        }}>
+          {tabs.map(t => {
+            const active_ = active===t.key;
+            return (
+              <button key={t.key} onClick={()=>onChange(t.key)} style={{
+                display:"flex", flexDirection:"column", alignItems:"center", gap:4,
+                background:"none", border:"none", cursor:"pointer", padding:"6px 18px",
+                color: active_ ? C.accent : C.textMuted,
+                transition:"color 0.2s ease", position:"relative",
+              }}>
+                {active_ && <div style={{
+                  position:"absolute", top:-9, width:22, height:3, borderRadius:2,
+                  background:C.accent, boxShadow:`0 0 10px ${C.accentGlow}`,
+                }}/>}
+                {t.icon}
+                <span style={{ fontFamily:font, fontSize:10, fontWeight: active_?700:500 }}>{t.label}</span>
+                {t.key==="alarms" && unreadAlarms>0 && (
+                  <div style={{
+                    position:"absolute", top:2, right:10, width:16, height:16, borderRadius:"50%",
+                    background:C.critical, display:"flex", alignItems:"center", justifyContent:"center",
+                    fontFamily:fontMono, fontSize:9, color:"#fff", fontWeight:700,
+                  }}>{unreadAlarms}</div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // ─── HEADER BAR ──────────────────────────────────────────────────────────
+    function Header({ title, onBack, right }) {
+      return (
+        <div style={{ display:"flex", alignItems:"center", padding:"14px 20px 10px", gap:10 }}>
+          {onBack ? (
+            <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer", color:C.textPrimary, padding:4, display:"flex" }}>
+              <IC.Back/>
+            </button>
+          ) : <div style={{width:30}}/>}
+          <div style={{ fontFamily:font, fontSize:17, fontWeight:700, color:C.textPrimary, flex:1, textAlign: onBack?"left":"center" }}>
+            {title}
+          </div>
+          {right ?? <div style={{width:30}}/>}
+        </div>
+      );
+    }
+
+    // ─── METRIC CARD ─────────────────────────────────────────────────────────
+    function MetricCard({ label, value, color, icon, sub }) {
+      return (
+        <div style={{ ...card, padding:"16px", flex:1, minWidth:0, position:"relative", overflow:"hidden" }}>
+          <div style={{ position:"absolute", top:-14, right:-14, width:56, height:56, borderRadius:"50%", background:`${color}08` }}/>
+          <div style={{
+            width:34, height:34, borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center",
+            background:`${color}15`, color, marginBottom:12,
+          }}>
+            {icon}
+          </div>
+          <div style={{ fontFamily:fontMono, fontSize:30, fontWeight:700, color:C.textPrimary, lineHeight:1 }}>{value}</div>
+          <div style={{ fontFamily:font, fontSize:10, color:C.textSecondary, marginTop:5, fontWeight:600, textTransform:"uppercase", letterSpacing:0.6 }}>{label}</div>
+          {sub && <div style={{ fontFamily:font, fontSize:11, color, marginTop:4 }}>{sub}</div>}
+        </div>
+      );
+    }
+
+    // ─── QUICK ACTION ────────────────────────────────────────────────────────
+    function QuickAction({ icon, label, color, onClick }) {
+      const [pressed, setPressed] = useState(false);
+      return (
+        <button onClick={onClick}
+          onMouseDown={()=>setPressed(true)} onMouseUp={()=>setPressed(false)} onMouseLeave={()=>setPressed(false)}
+          onTouchStart={()=>setPressed(true)} onTouchEnd={()=>setPressed(false)}
+          style={{
+            flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:9,
+            padding:"16px 6px", border:"none", cursor:"pointer",
+            ...card, borderRadius:14,
+            transform: pressed?"scale(0.94)":"scale(1)", transition:"transform 0.15s ease",
+            background: pressed ? `${color}12` : card.background,
+          }}>
+          <div style={{
+            width:44, height:44, borderRadius:12,
+            background:`${color}15`, color, display:"flex", alignItems:"center", justifyContent:"center",
+          }}>{icon}</div>
+          <span style={{ fontFamily:font, fontSize:11, fontWeight:600, color:C.textSecondary, letterSpacing:0.2 }}>{label}</span>
+        </button>
+      );
+    }
+
+    // ─── VEHICLE CARD ─────────────────────────────────────────────────────────
+    function VehicleCard({ v, onTrack, onVideo }) {
+      const [pressed, setPressed] = useState(false);
+      const statusColor = v.online ? C.accent : C.offline;
+      return (
+        <div
+          onMouseDown={()=>setPressed(true)} onMouseUp={()=>setPressed(false)} onMouseLeave={()=>setPressed(false)}
+          onTouchStart={()=>setPressed(true)} onTouchEnd={()=>setPressed(false)}
+          onClick={onTrack}
+          style={{
+            ...card, padding:"15px", marginBottom:10, cursor:"pointer",
+            transform: pressed?"scale(0.985)":"scale(1)", transition:"transform 0.15s ease",
+          }}
+        >
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+              <div style={{
+                width:42, height:42, borderRadius:11,
+                background: v.online ? C.accentDim : `${C.offline}18`,
+                display:"flex", alignItems:"center", justifyContent:"center", color:statusColor,
+              }}>
+                <IC.Truck/>
+              </div>
+              <div>
+                <div style={{ fontFamily:font, fontSize:14, fontWeight:600, color:C.textPrimary }}>{v.name}</div>
+                <div style={{ fontFamily:fontMono, fontSize:11, color:C.textMuted, marginTop:2 }}>{v.plate}</div>
+              </div>
+            </div>
+            <div style={{
+              padding:"4px 10px", borderRadius:20, fontSize:9.5, fontWeight:700, fontFamily:font, letterSpacing:0.6,
+              background: v.online ? C.accentDim : `${C.offline}18`,
+              color: statusColor, textTransform:"uppercase",
+            }}>
+              {v.online ? "LIVE" : "OFFLINE"}
+            </div>
+          </div>
+
+          <div style={{ display:"flex", alignItems:"center", gap:14, marginTop:13, paddingTop:11, borderTop:`1px solid ${C.border}` }}>
+            <div style={{ display:"flex", alignItems:"center", gap:4, color:C.textMuted }}>
+              <IC.Speed/>
+              <span style={{ fontFamily:fontMono, fontSize:13, color: v.speed>0 ? C.textPrimary : C.textMuted, fontWeight:600 }}>
+                {v.speed}<span style={{ fontSize:10, color:C.textMuted, fontWeight:400 }}> km/h</span>
+              </span>
+            </div>
+            {v.fuel <= 20 && (
+              <div style={{ display:"flex", alignItems:"center", gap:3, color:C.critical, fontSize:11, fontFamily:font, fontWeight:600 }}>
+                <IC.Fuel/> {v.fuel}%
+              </div>
+            )}
+            <div style={{ fontFamily:font, fontSize:11, color:C.textMuted }}>{v.lastUpdate}</div>
+            <div style={{ marginLeft:"auto", display:"flex", gap:7 }}>
+              <button onClick={e=>{e.stopPropagation();onTrack();}} style={{
+                padding:"6px 12px", borderRadius:8, border:"none", cursor:"pointer",
+                background:C.accentDim, color:C.accent,
+                fontFamily:font, fontSize:11, fontWeight:600, display:"flex", alignItems:"center", gap:4,
+              }}>
+                <IC.Map/> Track
+              </button>
+              <button onClick={e=>{e.stopPropagation();onVideo();}} style={{
+                width:32, height:32, borderRadius:8, border:"none", cursor:"pointer",
+                background:C.bgElevated, color:C.textSecondary,
+                display:"flex", alignItems:"center", justifyContent:"center",
+              }}>
+                <IC.Video/>
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── ALARM CARD ──────────────────────────────────────────────────────────
+    function AlarmCard({ a }) {
+      const sevColor = a.severity==="critical" ? C.critical : a.severity==="warning" ? C.warning : C.info;
+      const sevBg    = a.severity==="critical" ? C.criticalDim : a.severity==="warning" ? C.warningDim : C.infoDim;
+      return (
+        <div style={{ ...card, padding:"14px 16px", marginBottom:10, borderLeft:`3px solid ${sevColor}`, cursor:"pointer" }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:5 }}>
+                <span style={{
+                  padding:"3px 9px", borderRadius:6, fontSize:9.5, fontWeight:700, fontFamily:font,
+                  background:sevBg, color:sevColor, textTransform:"uppercase", letterSpacing:0.6,
+                }}>
+                  {a.severity}
+                </span>
+                <span style={{ fontFamily:font, fontSize:13, fontWeight:600, color:C.textPrimary }}>{a.type}</span>
+              </div>
+              <div style={{ fontFamily:font, fontSize:12, color:C.textMuted }}>{a.vehicle}</div>
+              <div style={{ fontFamily:font, fontSize:11, color:C.textMuted, marginTop:2 }}>{a.location}</div>
+            </div>
+            <span style={{ fontFamily:font, fontSize:11, color:C.textMuted, marginLeft:10, whiteSpace:"nowrap" }}>{a.time}</span>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── DASHBOARD ───────────────────────────────────────────────────────────
+    function DashboardScreen({ onNav, setSelVehicle }) {
+      const online  = vehicles.filter(v=>v.online).length;
+      const offline = vehicles.length - online;
+      const critical = alarms.filter(a=>a.severity==="critical").length;
+
+      return (
+        <div style={{ padding:"0 20px 20px", overflowY:"auto", height:"100%" }}>
+          {/* Greeting */}
+          <div style={{ padding:"16px 0 22px" }}>
+            <div style={{ fontFamily:font, fontSize:13, color:C.textSecondary }}>Good morning</div>
+            <div style={{ fontFamily:font, fontSize:25, fontWeight:700, color:C.textPrimary, lineHeight:1.2, marginTop:3 }}>Fleet Overview</div>
+          </div>
+
+          {/* Stats */}
+          <div style={{ display:"flex", gap:10, marginBottom:10 }}>
+            <MetricCard label="Total Fleet" value={vehicles.length} color={C.textPrimary} icon={<IC.Truck/>}/>
+            <MetricCard label="Online" value={online} color={C.accent} icon={<IC.Signal/>} sub={`${Math.round(online/vehicles.length*100)}% uptime`}/>
+          </div>
+          <div style={{ display:"flex", gap:10, marginBottom:26 }}>
+            <MetricCard label="Offline" value={offline} color={C.offline} icon={<IC.Eye/>}/>
+            <MetricCard label="Critical" value={critical} color={C.critical} icon={<IC.Bell/>} sub="Active alarms"/>
+          </div>
+
+          {/* Quick actions */}
+          <div style={{ fontFamily:font, fontSize:11, fontWeight:600, color:C.textMuted, marginBottom:12, letterSpacing:0.8, textTransform:"uppercase" }}>Quick Actions</div>
+          <div style={{ display:"flex", gap:10, marginBottom:28 }}>
+            <QuickAction icon={<IC.Map/>}   label="Live Track" color={C.accent}    onClick={()=>{setSelVehicle(vehicles[0]);onNav("tracking");}}/>
+            <QuickAction icon={<IC.Play/>}  label="Playback"   color={C.purple}    onClick={()=>onNav("playback")}/>
+            <QuickAction icon={<IC.Bell/>}  label="Alarms"     color={C.warning}   onClick={()=>onNav("alarms")}/>
+            <QuickAction icon={<IC.Video/>} label="Video"      color={C.critical}  onClick={()=>onNav("video")}/>
+          </div>
+
+          {/* Recent alarms */}
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
+            <div style={{ fontFamily:font, fontSize:11, fontWeight:600, color:C.textMuted, letterSpacing:0.8, textTransform:"uppercase" }}>Recent Alarms</div>
+            <button onClick={()=>onNav("alarms")} style={{ background:"none", border:"none", cursor:"pointer", fontFamily:font, fontSize:12, color:C.accent, fontWeight:600 }}>View All</button>
+          </div>
+          {alarms.slice(0,3).map(a => <AlarmCard key={a.id} a={a}/>)}
+
+          {/* Active vehicles */}
+          <div style={{ fontFamily:font, fontSize:11, fontWeight:600, color:C.textMuted, marginTop:22, marginBottom:12, letterSpacing:0.8, textTransform:"uppercase" }}>Active Vehicles</div>
+          {vehicles.filter(v=>v.online).slice(0,3).map(v => (
+            <VehicleCard key={v.id} v={v}
+              onTrack={()=>{setSelVehicle(v);onNav("tracking");}}
+              onVideo={()=>onNav("video")}
+            />
+          ))}
+        </div>
+      );
+    }
+
+    // ─── VEHICLES LIST ───────────────────────────────────────────────────────
+    function VehiclesScreen({ onNav, setSelVehicle }) {
+      const [filter, setFilter] = useState("all");
+      const [search, setSearch] = useState("");
+
+      const filtered = vehicles
+        .filter(v => filter==="all" || (filter==="online" ? v.online : !v.online))
+        .filter(v =>
+          v.name.toLowerCase().includes(search.toLowerCase()) ||
+          v.plate.toLowerCase().includes(search.toLowerCase())
+        );
+
+      return (
+        <div style={{ padding:"0 20px 20px", overflowY:"auto", height:"100%" }}>
+          <div style={{ padding:"16px 0 18px" }}>
+            <div style={{ fontFamily:font, fontSize:23, fontWeight:700, color:C.textPrimary }}>Fleet Vehicles</div>
+            <div style={{ fontFamily:font, fontSize:13, color:C.textSecondary, marginTop:3 }}>{vehicles.length} registered vehicles</div>
+          </div>
+
+          {/* Search bar */}
+          <div style={{ ...card, borderRadius:13, padding:"10px 14px", marginBottom:14, display:"flex", alignItems:"center", gap:10 }}>
+            <span style={{color:C.textMuted, display:"flex"}}><IC.Search/></span>
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search name or plate…"
+              style={{ background:"none", border:"none", outline:"none", flex:1, fontFamily:font, fontSize:14, color:C.textPrimary }}
+            />
+          </div>
+
+          {/* Filter tabs */}
+          <div style={{ display:"flex", gap:8, marginBottom:18, overflowX:"auto" }}>
+            {[
+              { key:"all",     label:`All (${vehicles.length})` },
+              { key:"online",  label:`Online (${vehicles.filter(v=>v.online).length})` },
+              { key:"offline", label:`Offline (${vehicles.filter(v=>!v.online).length})` },
+            ].map(f => (
+              <button key={f.key} onClick={()=>setFilter(f.key)} style={{
+                padding:"7px 16px", borderRadius:20, border:"none", cursor:"pointer", whiteSpace:"nowrap",
+                background: filter===f.key ? C.accent : C.bgCard,
+                color: filter===f.key ? C.bg : C.textSecondary,
+                fontFamily:font, fontSize:12, fontWeight:600,
+                transition:"all 0.2s ease",
+              }}>{f.label}</button>
+            ))}
+          </div>
+
+          {filtered.map(v => (
+            <VehicleCard key={v.id} v={v}
+              onTrack={()=>{setSelVehicle(v);onNav("tracking");}}
+              onVideo={()=>onNav("video")}
+            />
+          ))}
+          {filtered.length===0 && (
+            <div style={{ textAlign:"center", padding:50, fontFamily:font, color:C.textMuted }}>No vehicles found</div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── LIVE TRACKING ───────────────────────────────────────────────────────
+    function TrackingScreen({ vehicle, onBack, onVideo }) {
+      const v = vehicle || vehicles[0];
+      const [showInfo, setShowInfo] = useState(false);
+      const [animateMarker, setAnimateMarker] = useState(true);
+
+      return (
+        <div style={{ height:"100%", display:"flex", flexDirection:"column", position:"relative" }}>
+          {/* Map canvas */}
+          <div style={{
+            flex:1, position:"relative",
+            background:`radial-gradient(ellipse at 60% 40%, #112233, ${C.navy})`,
+            overflow:"hidden",
+          }}>
+            {/* Grid */}
+            <div style={{
+              position:"absolute", inset:0, opacity:0.07,
+              backgroundImage:`linear-gradient(${C.accent} 1px, transparent 1px), linear-gradient(90deg, ${C.accent} 1px, transparent 1px)`,
+              backgroundSize:"62px 62px",
+            }}/>
+            {/* Roads SVG */}
+            <svg style={{ position:"absolute", inset:0, width:"100%", height:"100%", overflow:"visible" }}>
+              <defs>
+                <filter id="roadGlow">
+                  <feGaussianBlur stdDeviation="2" result="glow"/>
+                  <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              {/* Background roads */}
+              <line x1="0%" y1="38%" x2="100%" y2="54%" stroke={C.textMuted} strokeWidth="2.5" opacity="0.18" strokeLinecap="round"/>
+              <line x1="18%" y1="0" x2="58%" y2="100%" stroke={C.textMuted} strokeWidth="2" opacity="0.14" strokeLinecap="round"/>
+              <line x1="52%" y1="0" x2="82%" y2="100%" stroke={C.textMuted} strokeWidth="1.5" opacity="0.10" strokeLinecap="round"/>
+              <line x1="0" y1="65%" x2="100%" y2="72%" stroke={C.textMuted} strokeWidth="1.5" opacity="0.12" strokeLinecap="round"/>
+              {/* Traveled route */}
+              <polyline points="70,260 130,240 185,205 245,228 295,190 340,210" stroke={C.textMuted} strokeWidth="3.5" fill="none" opacity="0.2" strokeLinecap="round" strokeLinejoin="round"/>
+              <polyline points="70,260 130,240 185,205 245,228 295,190 340,210" stroke={C.accent} strokeWidth="3" fill="none" opacity="0.6" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="8,5"/>
+              {/* Start / End dots */}
+              <circle cx="70" cy="260" r="5" fill={C.purple} opacity="0.7"/>
+              <circle cx="340" cy="210" r="5" fill={C.critical} opacity="0.7"/>
+            </svg>
+
+            {/* Vehicle marker */}
+            <div style={{ position:"absolute", top:"40%", left:"56%", transform:"translate(-50%,-50%)" }}>
+              {/* Pulse ring */}
+              <div style={{
+                position:"absolute", inset:"-14px", borderRadius:"50%",
+                border:`2px solid ${C.accent}`, opacity:0.25,
+                animation: animateMarker ? "pulse 2.2s ease infinite" : "none",
+              }}/>
+              <div style={{
+                width:46, height:46, borderRadius:"50%",
+                background:C.accentDim,
+                display:"flex", alignItems:"center", justifyContent:"center",
+                boxShadow:`0 0 28px ${C.accentGlow}`,
+              }}>
+                <div style={{
+                  width:32, height:32, borderRadius:"50%", background:C.accent,
+                  display:"flex", alignItems:"center", justifyContent:"center",
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill={C.bg}><path d="M12 2L4 12l8 10 8-10L12 2z"/></svg>
+                </div>
+              </div>
+              {/* Speed badge */}
+              <div style={{
+                position:"absolute", top:-38, left:"50%", transform:"translateX(-50%)", whiteSpace:"nowrap",
+                background:C.bgCard, padding:"4px 10px", borderRadius:8,
+                fontFamily:fontMono, fontSize:12, fontWeight:700, color:C.accent,
+                border:`1px solid ${C.accent}30`, boxShadow:"0 2px 12px rgba(0,0,0,0.4)",
+              }}>
+                {v.speed} km/h
+              </div>
+            </div>
+
+            {/* Back button */}
+            <button onClick={onBack} style={{
+              position:"absolute", top:14, left:14,
+              width:40, height:40, borderRadius:12, border:"none", cursor:"pointer",
+              background:C.bgOverlay, color:C.textPrimary, display:"flex", alignItems:"center", justifyContent:"center",
+              backdropFilter:"blur(12px)",
+            }}>
+              <IC.Back/>
+            </button>
+
+            {/* LIVE badge */}
+            <div style={{
+              position:"absolute", top:16, right:14, display:"flex", alignItems:"center", gap:6,
+              background:C.bgOverlay, padding:"7px 13px", borderRadius:20,
+              backdropFilter:"blur(12px)",
+            }}>
+              <div style={{ width:8, height:8, borderRadius:"50%", background:C.accent, animation:"blink 1.5s ease infinite" }}/>
+              <span style={{ fontFamily:font, fontSize:11, fontWeight:700, color:C.accent }}>LIVE</span>
+            </div>
+
+            {/* Map controls */}
+            <div style={{ position:"absolute", bottom:18, right:14, display:"flex", flexDirection:"column", gap:8 }}>
+              {["+","−"].map(sym => (
+                <button key={sym} style={{
+                  width:36, height:36, borderRadius:10, border:"none", cursor:"pointer",
+                  background:C.bgOverlay, color:C.textPrimary,
+                  display:"flex", alignItems:"center", justifyContent:"center",
+                  fontFamily:fontMono, fontSize:16, fontWeight:700,
+                  backdropFilter:"blur(12px)",
+                }}>{sym}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Info panel */}
+          <div style={{ background:C.bg, padding:"16px 20px 18px", borderTop:`1px solid ${C.border}` }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:14 }}>
+              <div>
+                <div style={{ fontFamily:font, fontSize:16, fontWeight:700, color:C.textPrimary }}>{v.name}</div>
+                <div style={{ fontFamily:fontMono, fontSize:11, color:C.textMuted, marginTop:2 }}>{v.plate} · {v.driver}</div>
+                <div style={{ fontFamily:font, fontSize:11, color:C.textSecondary, marginTop:3 }}>{v.route}</div>
+              </div>
+              <div style={{ textAlign:"right" }}>
+                <div style={{
+                  padding:"6px 14px", borderRadius:20, background:C.accentDim,
+                  fontFamily:fontMono, fontSize:14, fontWeight:700, color:C.accent,
+                }}>
+                  {v.speed} km/h
+                </div>
+                <div style={{ fontFamily:font, fontSize:10, color:C.textMuted, marginTop:5 }}>Updated {v.lastUpdate}</div>
+              </div>
+            </div>
+
+            <div style={{ display:"flex", gap:9 }}>
+              <button onClick={()=>onBack()} style={{
+                flex:1, padding:"12px", borderRadius:12, border:"none", cursor:"pointer",
+                background:C.accentDim, color:C.accent,
+                fontFamily:font, fontSize:13, fontWeight:600,
+                display:"flex", alignItems:"center", justifyContent:"center", gap:6,
+              }}>
+                <IC.Play/> Playback
+              </button>
+              <button onClick={onVideo} style={{
+                flex:1, padding:"12px", borderRadius:12, cursor:"pointer",
+                background:C.bgCard, color:C.textSecondary,
+                fontFamily:font, fontSize:13, fontWeight:600,
+                display:"flex", alignItems:"center", justifyContent:"center", gap:6,
+                border:`1px solid ${C.border}`,
+              }}>
+                <IC.Video/> Video
+              </button>
+              <button style={{
+                padding:"12px 14px", borderRadius:12, cursor:"pointer",
+                background:C.bgCard, color:C.textSecondary,
+                display:"flex", alignItems:"center", justifyContent:"center",
+                border:`1px solid ${C.border}`,
+              }}>
+                <IC.Command/>
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── PLAYBACK ────────────────────────────────────────────────────────────
+    function PlaybackScreen({ onBack }) {
+      const [playing, setPlaying] = useState(false);
+      const [progress, setProgress] = useState(35);
+      const [speed, setSpeed] = useState(1);
+      const speeds = [1, 2, 4, 8];
+      const nextSpeed = () => setSpeed(s => { const i = speeds.indexOf(s); return speeds[(i+1)%speeds.length]; });
+
+      const seekTo = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+        setProgress(Math.max(0, Math.min(100, Math.round(x / rect.width * 100))));
+      };
+
+      return (
+        <div style={{ height:"100%", display:"flex", flexDirection:"column" }}>
+          <div style={{
+            flex:1, position:"relative",
+            background:`radial-gradient(ellipse at 40% 50%, #112033, ${C.navy})`,
+            overflow:"hidden",
+          }}>
+            <div style={{
+              position:"absolute", inset:0, opacity:0.06,
+              backgroundImage:`linear-gradient(${C.accent} 1px, transparent 1px), linear-gradient(90deg, ${C.accent} 1px, transparent 1px)`,
+              backgroundSize:"62px 62px",
+            }}/>
+            <svg style={{ position:"absolute", inset:0, width:"100%", height:"100%", overflow:"visible" }}>
+              {/* Full route (dim) */}
+              <polyline points="40,310 88,265 148,280 208,210 270,235 335,170 380,195"
+                stroke={C.textMuted} strokeWidth="3" fill="none" opacity="0.25" strokeLinecap="round" strokeLinejoin="round"/>
+              {/* Traveled portion */}
+              <polyline points={`40,310 88,265 148,280 ${Math.min(208, 40+168*progress/100)},${210+Math.max(0,(progress-50)*0.5)}`}
+                stroke={C.accent} strokeWidth="3" fill="none" opacity="0.75" strokeLinecap="round" strokeLinejoin="round"/>
+              {/* Start */}
+              <circle cx="40" cy="310" r="7" fill={C.purple} opacity="0.7"/>
+              <circle cx="40" cy="310" r="12" fill={C.purple} opacity="0.15"/>
+              {/* End */}
+              <circle cx="380" cy="195" r="7" fill={C.critical} opacity="0.7"/>
+              <circle cx="380" cy="195" r="12" fill={C.critical} opacity="0.15"/>
+              {/* Current position */}
+              <circle cx={40+280*progress/100} cy={310-100*progress/100} r="9" fill={C.accent} opacity="0.9">
+                <animate attributeName="r" values="9;13;9" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.9;0.5;0.9" dur="2s" repeatCount="indefinite"/>
+              </circle>
+            </svg>
+
+            <button onClick={onBack} style={{
+              position:"absolute", top:14, left:14, width:40, height:40, borderRadius:12,
+              border:"none", cursor:"pointer", background:C.bgOverlay, color:C.textPrimary,
+              display:"flex", alignItems:"center", justifyContent:"center", backdropFilter:"blur(12px)",
+            }}>
+              <IC.Back/>
+            </button>
+
+            <div style={{
+              position:"absolute", top:16, right:14, background:C.bgOverlay, padding:"8px 14px",
+              borderRadius:10, backdropFilter:"blur(12px)", display:"flex", alignItems:"center", gap:8,
+              color:C.textPrimary,
+            }}>
+              <IC.Calendar/>
+              <span style={{ fontFamily:font, fontSize:12, fontWeight:600 }}>Feb 22, 2026</span>
+            </div>
+          </div>
+
+          {/* Playback controls */}
+          <div style={{ background:C.bg, padding:"16px 20px 22px", borderTop:`1px solid ${C.border}` }}>
+            <div style={{ fontFamily:font, fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:2 }}>
+              Truck Alpha-01 · Route Playback
+            </div>
+            <div style={{ fontFamily:fontMono, fontSize:11, color:C.textMuted, marginBottom:16 }}>
+              08:00 – 14:00 · {Math.round(126*progress/100)} km / 126 km
+            </div>
+
+            {/* Timestamps */}
+            <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
+              <span style={{ fontFamily:fontMono, fontSize:10, color:C.textSecondary }}>
+                {String(8+Math.floor(6*progress/100)).padStart(2,"0")}:{String(Math.floor(60*(6*progress/100)%1*60)).padStart(2,"0")} AM
+              </span>
+              <span style={{ fontFamily:fontMono, fontSize:10, color:C.textMuted }}>14:00 PM</span>
+            </div>
+
+            {/* Timeline scrubber */}
+            <div
+              style={{ height:8, background:C.bgCard, borderRadius:4, overflow:"hidden", cursor:"pointer", marginBottom:18, position:"relative" }}
+              onClick={seekTo} onTouchStart={seekTo}
+            >
+              <div style={{
+                height:"100%", width:`${progress}%`, borderRadius:4,
+                background:`linear-gradient(90deg, ${C.accent}, #00C853)`,
+                transition:"width 0.1s ease",
+              }}/>
+              <div style={{
+                position:"absolute", top:"50%", left:`${progress}%`, transform:"translate(-50%,-50%)",
+                width:14, height:14, borderRadius:"50%", background:C.accent,
+                border:`2px solid ${C.bg}`, boxShadow:`0 0 8px ${C.accentGlow}`,
+              }}/>
+            </div>
+
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:22 }}>
+              <button onClick={nextSpeed} style={{
+                padding:"7px 15px", borderRadius:9, border:`1px solid ${C.border}`,
+                background:C.bgCard, cursor:"pointer",
+                fontFamily:fontMono, fontSize:13, fontWeight:700, color:C.accent,
+              }}>
+                {speed}×
+              </button>
+              <button onClick={()=>setPlaying(p=>!p)} style={{
+                width:56, height:56, borderRadius:"50%", border:"none", cursor:"pointer",
+                background:`linear-gradient(135deg, ${C.accent}, #00C853)`,
+                display:"flex", alignItems:"center", justifyContent:"center",
+                boxShadow: glow(C.accent), color:C.bg,
+              }}>
+                {playing
+                  ? <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+                  : <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg>
+                }
+              </button>
+              <button onClick={()=>{setPlaying(false);setProgress(0);}} style={{
+                padding:"7px 15px", borderRadius:9, border:`1px solid ${C.border}`,
+                background:C.bgCard, cursor:"pointer",
+                fontFamily:font, fontSize:12, fontWeight:600, color:C.textSecondary,
+              }}>
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── ALARMS ──────────────────────────────────────────────────────────────
+    function AlarmsScreen() {
+      const [filter, setFilter] = useState("all");
+      const [dismissed, setDismissed] = useState([]);
+
+      const visible = alarms
+        .filter(a => filter==="all" || a.severity===filter)
+        .filter(a => !dismissed.includes(a.id));
+
+      const sevColors = { critical:C.critical, warning:C.warning, info:C.info, all:C.accent };
+
+      return (
+        <div style={{ padding:"0 20px 20px", overflowY:"auto", height:"100%" }}>
+          <div style={{ padding:"16px 0 20px" }}>
+            <div style={{ fontFamily:font, fontSize:23, fontWeight:700, color:C.textPrimary }}>Alarms</div>
+            <div style={{ fontFamily:font, fontSize:13, color:C.textSecondary, marginTop:3 }}>
+              {alarms.filter(a=>a.severity==="critical").length} critical · {alarms.filter(a=>a.severity==="warning").length} warnings
+            </div>
+          </div>
+
+          <div style={{ display:"flex", gap:8, marginBottom:20, overflowX:"auto" }}>
+            {["all","critical","warning","info"].map(f => (
+              <button key={f} onClick={()=>setFilter(f)} style={{
+                padding:"7px 16px", borderRadius:20, border:"none", cursor:"pointer", whiteSpace:"nowrap",
+                background: filter===f ? (sevColors[f]||C.accent) : C.bgCard,
+                color: filter===f ? (f==="all" ? C.bg : "#fff") : C.textSecondary,
+                fontFamily:font, fontSize:12, fontWeight:600,
+                transition:"all 0.2s ease",
+              }}>
+                {f.charAt(0).toUpperCase()+f.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          {visible.map(a => <AlarmCard key={a.id} a={a}/>)}
+          {visible.length===0 && (
+            <div style={{ textAlign:"center", padding:50, fontFamily:font, color:C.textMuted }}>
+              <IC.Shield/>
+              <div style={{ marginTop:12 }}>All clear — no alarms</div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── LIVE VIDEO ──────────────────────────────────────────────────────────
+    function VideoScreen({ onBack, vehicle }) {
+      const v = vehicle || vehicles[0];
+      const [layout, setLayout] = useState(4);
+      const [quality, setQuality] = useState("Sub");
+      const [fullscreenCam, setFullscreenCam] = useState(null);
+
+      const camLabels = ["Front View","Rear View","Left Side","Right Side","Driver Cam","Cabin Cam","Cargo Cam","Exterior"];
+
+      const CamFeed = ({ idx }) => {
+        const [signal] = useState(() => Math.floor(Math.random()*2)+2); // 2-3 bars
+        const isFull = fullscreenCam === idx;
+        return (
+          <div
+            onClick={() => setFullscreenCam(fullscreenCam===idx ? null : idx)}
+            style={{
+              flex:1, background:"#060A0F", borderRadius: layout===1 ? 0 : 10,
+              position:"relative", overflow:"hidden", minHeight:0, cursor:"pointer",
+              border:`1px solid ${C.border}`,
+            }}
+          >
+            {/* Scanlines */}
+            <div style={{
+              position:"absolute", inset:0, opacity:0.035,
+              background:"repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.15) 2px,rgba(255,255,255,0.15) 4px)",
+              pointerEvents:"none",
+            }}/>
+            {/* Vignette */}
+            <div style={{
+              position:"absolute", inset:0,
+              background:"radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5))",
+              pointerEvents:"none",
+            }}/>
+            {/* Placeholder content */}
+            <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <div style={{ textAlign:"center" }}>
+                <div style={{
+                  width:32, height:32, borderRadius:8, background:`${C.textMuted}18`,
+                  display:"flex", alignItems:"center", justifyContent:"center",
+                  margin:"0 auto 8px", color:C.textMuted,
+                }}>
+                  <IC.Video/>
+                </div>
+                <span style={{ fontFamily:fontMono, fontSize:layout===4?9:11, color:C.textMuted }}>
+                  CAM {idx} · {quality}
+                </span>
+              </div>
+            </div>
+            {/* REC badge */}
+            <div style={{ position:"absolute", top:7, left:8, display:"flex", alignItems:"center", gap:4 }}>
+              <div style={{ width:7, height:7, borderRadius:"50%", background:C.critical, animation:"blink 1.5s ease infinite" }}/>
+              <span style={{ fontFamily:fontMono, fontSize:9, color:C.critical, fontWeight:700 }}>REC</span>
+            </div>
+            {/* Camera label */}
+            {layout <= 2 && (
+              <div style={{
+                position:"absolute", bottom:8, left:8,
+                background:C.bgOverlay, padding:"3px 8px", borderRadius:6,
+                fontFamily:fontMono, fontSize:10, color:C.textSecondary,
+              }}>
+                {camLabels[idx-1] || `Channel ${idx}`}
+              </div>
+            )}
+            {/* Signal bars */}
+            <div style={{ position:"absolute", top:7, right:8, display:"flex", alignItems:"flex-end", gap:2 }}>
+              {[1,2,3,4].map(b => (
+                <div key={b} style={{
+                  width:3, height:3+b*3, borderRadius:1,
+                  background: b<=signal ? C.accent : `${C.textMuted}30`,
+                }}/>
+              ))}
+            </div>
+            {/* Timestamp */}
+            {layout <= 2 && (
+              <div style={{
+                position:"absolute", bottom:8, right:8,
+                fontFamily:fontMono, fontSize:9, color:C.textMuted,
+              }}>
+                {new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",second:"2-digit"})}
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      const renderGrid = () => {
+        if (layout === 1) {
+          return (
+            <div style={{ flex:1, display:"flex" }}>
+              <CamFeed idx={fullscreenCam || 1}/>
+            </div>
+          );
+        }
+        if (layout === 2) {
+          return (
+            <div style={{ flex:1, display:"flex", gap:8, padding:"0 12px 8px" }}>
+              <CamFeed idx={1}/><CamFeed idx={2}/>
+            </div>
+          );
+        }
+        // 4CH: 2×2
+        return (
+          <div style={{ flex:1, display:"flex", flexDirection:"column", gap:8, padding:"0 12px 8px" }}>
+            <div style={{ flex:1, display:"flex", gap:8 }}>
+              <CamFeed idx={1}/><CamFeed idx={2}/>
+            </div>
+            <div style={{ flex:1, display:"flex", gap:8 }}>
+              <CamFeed idx={3}/><CamFeed idx={4}/>
+            </div>
+          </div>
+        );
+      };
+
+      return (
+        <div style={{ height:"100%", display:"flex", flexDirection:"column", background:"#050709" }}>
+          {/* Header */}
+          <div style={{ display:"flex", alignItems:"center", padding:"12px 16px 4px", gap:10 }}>
+            <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer", color:C.textPrimary, padding:4, display:"flex" }}>
+              <IC.Back/>
+            </button>
+            <div style={{ flex:1 }}>
+              <div style={{ fontFamily:font, fontSize:15, fontWeight:700, color:C.textPrimary }}>Live Video</div>
+              <div style={{ fontFamily:fontMono, fontSize:10, color:C.textMuted, marginTop:1 }}>{v.name} · {v.plate}</div>
+            </div>
+            {/* Quality toggle */}
+            <button onClick={()=>setQuality(q=>q==="Sub"?"Main":"Sub")} style={{
+              padding:"5px 12px", borderRadius:8, border:`1px solid ${C.border}`, cursor:"pointer",
+              background:quality==="Main" ? C.accentDim : C.bgCard,
+              color:quality==="Main" ? C.accent : C.textSecondary,
+              fontFamily:fontMono, fontSize:11, fontWeight:600,
+            }}>
+              {quality} Stream
+            </button>
+          </div>
+
+          {/* Layout tabs */}
+          <div style={{ display:"flex", gap:6, padding:"8px 16px 10px", justifyContent:"center" }}>
+            {[1,2,4].map(l => (
+              <button key={l} onClick={()=>setLayout(l)} style={{
+                padding:"6px 20px", borderRadius:8, border:"none", cursor:"pointer",
+                background: layout===l ? C.accent : C.bgCard,
+                color: layout===l ? C.bg : C.textSecondary,
+                fontFamily:fontMono, fontSize:11, fontWeight:700,
+                transition:"all 0.2s ease",
+              }}>
+                {l}CH
+              </button>
+            ))}
+          </div>
+
+          {/* Video grid */}
+          <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
+            {renderGrid()}
+          </div>
+
+          {/* Bottom strip */}
+          <div style={{
+            display:"flex", alignItems:"center", gap:10, padding:"10px 16px 16px",
+            borderTop:`1px solid ${C.border}`, background:"#050709",
+          }}>
+            <div style={{ flex:1 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                <div style={{ width:8, height:8, borderRadius:"50%", background:C.critical, animation:"blink 1.5s ease infinite" }}/>
+                <span style={{ fontFamily:fontMono, fontSize:11, color:C.critical, fontWeight:700 }}>RECORDING</span>
+              </div>
+              <div style={{ fontFamily:font, fontSize:11, color:C.textMuted, marginTop:3 }}>
+                {layout}CH · {quality} Stream · 8 channels available
+              </div>
+            </div>
+            <button style={{
+              padding:"8px 16px", borderRadius:9, border:`1px solid ${C.border}`,
+              background:C.bgCard, color:C.textSecondary,
+              fontFamily:font, fontSize:12, fontWeight:600, cursor:"pointer",
+            }}>
+              Snapshot
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── PROFILE ─────────────────────────────────────────────────────────────
+    function ProfileScreen({ onLogout }) {
+      const stats = [
+        { label:"Total Vehicles", value:vehicles.length },
+        { label:"Online Now",     value:vehicles.filter(v=>v.online).length },
+        { label:"Alarms Today",   value:alarms.length },
+      ];
+
+      const settings = [
+        { icon:<IC.Bell/>,     label:"Notifications",    value:"All enabled",  color:C.warning },
+        { icon:<IC.Map/>,      label:"Map Style",         value:"Dark Pro",     color:C.accent },
+        { icon:<IC.Signal/>,   label:"Data Refresh",      value:"30 seconds",   color:C.info },
+        { icon:<IC.Shield/>,   label:"Security",          value:"2FA enabled",  color:C.purple },
+        { icon:<IC.Settings/>, label:"App Settings",      value:"",             color:C.textSecondary },
+      ];
+
+      return (
+        <div style={{ padding:"0 20px 30px", overflowY:"auto", height:"100%" }}>
+          {/* Avatar section */}
+          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"30px 0 28px" }}>
+            <div style={{
+              width:80, height:80, borderRadius:"50%",
+              background:`linear-gradient(135deg, ${C.accent}, #00C853)`,
+              display:"flex", alignItems:"center", justifyContent:"center",
+              fontSize:32, fontWeight:700, fontFamily:font, color:C.bg,
+              boxShadow: glow(C.accent), marginBottom:16,
+            }}>
+              A
+            </div>
+            <div style={{ fontFamily:font, fontSize:18, fontWeight:700, color:C.textPrimary }}>Admin User</div>
+            <div style={{ fontFamily:font, fontSize:13, color:C.textMuted, marginTop:4 }}>Fleet Administrator</div>
+            <div style={{
+              marginTop:12, padding:"5px 16px", borderRadius:20,
+              background:C.accentDim, border:`1px solid ${C.accent}28`,
+              fontFamily:font, fontSize:11, fontWeight:700, color:C.accent,
+            }}>
+              PRO PLAN
+            </div>
+          </div>
+
+          {/* Quick stats */}
+          <div style={{ display:"flex", gap:10, marginBottom:28 }}>
+            {stats.map((s,i) => (
+              <div key={i} style={{ ...card, padding:"14px 10px", flex:1, textAlign:"center" }}>
+                <div style={{ fontFamily:fontMono, fontSize:22, fontWeight:700, color:C.textPrimary }}>{s.value}</div>
+                <div style={{ fontFamily:font, fontSize:10, color:C.textMuted, marginTop:4, fontWeight:600 }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Settings */}
+          <div style={{ fontFamily:font, fontSize:11, fontWeight:600, color:C.textMuted, marginBottom:12, letterSpacing:0.8, textTransform:"uppercase" }}>Settings</div>
+          <div style={{ ...card, borderRadius:16, overflow:"hidden", marginBottom:16 }}>
+            {settings.map((s, i) => (
+              <div key={i} style={{
+                display:"flex", alignItems:"center", gap:14, padding:"14px 16px",
+                borderBottom: i<settings.length-1 ? `1px solid ${C.border}` : "none",
+                cursor:"pointer",
+              }}>
+                <div style={{
+                  width:36, height:36, borderRadius:10,
+                  background:`${s.color}15`, color:s.color,
+                  display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0,
+                }}>
+                  {s.icon}
+                </div>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontFamily:font, fontSize:14, fontWeight:500, color:C.textPrimary }}>{s.label}</div>
+                  {s.value && <div style={{ fontFamily:font, fontSize:11, color:C.textMuted, marginTop:2 }}>{s.value}</div>}
+                </div>
+                <IC.Chevron/>
+              </div>
+            ))}
+          </div>
+
+          {/* Sign out */}
+          <button onClick={onLogout} style={{
+            width:"100%", padding:"15px", borderRadius:14, cursor:"pointer",
+            background:C.criticalDim, border:`1px solid ${C.critical}30`,
+            fontFamily:font, fontSize:14, fontWeight:600, color:C.critical,
+            display:"flex", alignItems:"center", justifyContent:"center", gap:8,
+          }}>
+            <IC.Logout/> Sign Out
+          </button>
+        </div>
+      );
+    }
+
+    // ─── APP ROOT ─────────────────────────────────────────────────────────────
+    function App() {
+      const [phase, setPhase] = useState("splash"); // splash → login → app
+      const [screen, setScreen] = useState("dashboard");
+      const [selVehicle, setSelVehicle] = useState(null);
+
+      // Screens that have their own full layout (no shared shell)
+      const fullScreens = new Set(["tracking","playback","video"]);
+
+      const handleNav = useCallback((dest) => {
+        setScreen(dest);
+      }, []);
+
+      if (phase === "splash") {
+        return <SplashScreen onFinish={() => setPhase("login")}/>;
+      }
+
+      if (phase === "login") {
+        return <LoginScreen onLogin={() => setPhase("app")}/>;
+      }
+
+      // App shell
+      const renderContent = () => {
+        switch (screen) {
+          case "tracking":
+            return <TrackingScreen
+              vehicle={selVehicle}
+              onBack={() => setScreen("dashboard")}
+              onVideo={() => setScreen("video")}
+            />;
+          case "playback":
+            return <PlaybackScreen onBack={() => setScreen("dashboard")}/>;
+          case "video":
+            return <VideoScreen onBack={() => setScreen("dashboard")} vehicle={selVehicle}/>;
+          case "vehicles":
+            return <VehiclesScreen onNav={handleNav} setSelVehicle={setSelVehicle}/>;
+          case "alarms":
+            return <AlarmsScreen/>;
+          case "profile":
+            return <ProfileScreen onLogout={() => setPhase("login")}/>;
+          default:
+            return <DashboardScreen onNav={handleNav} setSelVehicle={setSelVehicle}/>;
+        }
+      };
+
+      if (fullScreens.has(screen)) {
+        // Full bleed screens (no nav bar)
+        return (
+          <div style={{ height:"100%", display:"flex", flexDirection:"column", background:C.bg, animation:"fadeIn 0.25s ease" }}>
+            {renderContent()}
+          </div>
+        );
+      }
+
+      // Standard shell with header + nav
+      return (
+        <div style={{ height:"100%", display:"flex", flexDirection:"column", background:C.bg, animation:"fadeIn 0.25s ease" }}>
+          {screen === "dashboard" && (
+            <Header
+              title="Axle Tracking"
+              right={
+                <button style={{ background:"none", border:"none", cursor:"pointer", color:C.textMuted, display:"flex", padding:4 }}>
+                  <IC.Search/>
+                </button>
+              }
+            />
+          )}
+          <div style={{ flex:1, overflow:"hidden", display:"flex", flexDirection:"column" }}>
+            {renderContent()}
+          </div>
+          <NavBar active={screen} onChange={handleNav}/>
+        </div>
+      );
+    }
+
+    // ─── MOUNT ────────────────────────────────────────────────────────────────
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App/>);
+  </script>
+</body>
+</html>

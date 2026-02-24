@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Axle Tracking CMS — App Icon -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#131820"/>
+      <stop offset="1" stop-color="#0D1B2A"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#00E676"/>
+      <stop offset="1" stop-color="#00C853"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="115" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="115" stroke="#00E676" stroke-width="2" opacity="0.08"/>
+
+  <!-- Outer orbit ring -->
+  <circle cx="256" cy="248" r="165" stroke="#00E676" stroke-width="2" opacity="0.12"/>
+
+  <!-- Wheel ring -->
+  <circle cx="256" cy="248" r="108" stroke="#00E676" stroke-width="3" opacity="0.22"/>
+
+  <!-- Inner ring -->
+  <circle cx="256" cy="248" r="58" stroke="#00E676" stroke-width="3" opacity="0.32"/>
+
+  <!-- Spokes -->
+  <line x1="256" y1="148" x2="256" y2="194" stroke="#00E676" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
+  <line x1="309" y1="297" x2="283" y2="282" stroke="#00E676" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
+  <line x1="203" y1="297" x2="229" y2="282" stroke="#00E676" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
+
+  <!-- Hub -->
+  <circle cx="256" cy="248" r="32" fill="#0D1B2A" stroke="#00E676" stroke-width="3" opacity="0.7"/>
+
+  <!-- Nav arrow -->
+  <path d="M256 224 L270 256 L256 249 L242 256 Z" fill="#00E676"/>
+
+  <!-- Signal arcs -->
+  <path d="M316 192 A76 76 0 0 1 340 248" stroke="#00E676" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+  <path d="M328 176 A96 96 0 0 1 362 248" stroke="#00E676" stroke-width="3" stroke-linecap="round" opacity="0.35"/>
+  <path d="M340 160 A116 116 0 0 1 384 248" stroke="#00E676" stroke-width="2" stroke-linecap="round" opacity="0.18"/>
+
+  <!-- Tracking dot -->
+  <circle cx="340" cy="248" r="6.5" fill="#00E676" opacity="0.85">
+    <animate attributeName="opacity" values="0.85;0.3;0.85" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>

@@ -1,0 +1,39 @@
+name: axle-tracking
+
+static_sites:
+  - name: web
+    github:
+      repo: your-org/axle_tracking_cms
+      branch: main
+      deploy_on_push: true
+    source_dir: /
+    environment_slug: html
+    build_command: |
+      set -e
+      FLUTTER_VERSION=3.24.5
+      git clone --depth 1 --branch "$FLUTTER_VERSION" https://github.com/flutter/flutter.git /tmp/flutter
+      export PATH="/tmp/flutter/bin:$PATH"
+      flutter config --enable-web
+
+      cat > .env <<EOF
+      API_BASE_URL=${API_BASE_URL}
+      GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
+      WEB_DIRECT_STREAM_ONLY=${WEB_DIRECT_STREAM_ONLY}
+      EOF
+
+      flutter pub get
+      flutter build web --release
+    output_dir: build/web
+    catchall_document: index.html
+    routes:
+      - path: /
+    envs:
+      - key: API_BASE_URL
+        scope: BUILD_TIME
+        value: https://api.example.com
+      - key: GOOGLE_MAPS_API_KEY
+        scope: BUILD_TIME
+        value: YOUR_PUBLIC_MAPS_KEY
+      - key: WEB_DIRECT_STREAM_ONLY
+        scope: BUILD_TIME
+        value: "true"

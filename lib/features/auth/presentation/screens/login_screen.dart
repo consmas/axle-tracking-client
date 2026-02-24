@@ -4,6 +4,7 @@ import 'package:axle_tracking_cms/features/auth/presentation/controllers/auth_co
 import 'package:axle_tracking_cms/features/auth/presentation/providers/auth_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -14,8 +15,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _emailController =
-      TextEditingController(text: 'admin@axle.com');
+  final _emailController = TextEditingController(text: 'admin@axle.com');
   final _passwordController = TextEditingController(text: 'password');
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
@@ -80,8 +80,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         child: SingleChildScrollView(
                           padding: const EdgeInsets.all(AxleSpacing.xxxl),
                           child: ConstrainedBox(
-                            constraints:
-                                const BoxConstraints(maxWidth: 380),
+                            constraints: const BoxConstraints(maxWidth: 380),
                             child: _LoginForm(
                               emailController: _emailController,
                               passwordController: _passwordController,
@@ -114,33 +113,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Container(
+                          SvgPicture.asset(
+                            'assets/images/logo_mark.svg',
                             width: 44,
                             height: 44,
-                            decoration: BoxDecoration(
-                              gradient: AxleColors.accentGradient,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AxleColors.accent
-                                      .withValues(alpha: 0.3),
-                                  blurRadius: 14,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: const Icon(Icons.navigation_rounded,
-                                color: AxleColors.bg, size: 22),
                           ),
                           const SizedBox(width: 12),
-                          const Text(
-                            'AXLETRACK',
-                            style: TextStyle(
-                              color: AxleColors.textPrimary,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 20,
-                              letterSpacing: 0.8,
-                            ),
+                          SvgPicture.asset(
+                            'assets/images/lockup_horizontal.svg',
+                            width: 170,
+                            fit: BoxFit.contain,
                           ),
                         ],
                       ),
@@ -191,33 +173,17 @@ class _BrandPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Logo mark
-          Container(
+          SvgPicture.asset(
+            'assets/images/logo_mark.svg',
             width: 52,
             height: 52,
-            decoration: BoxDecoration(
-              gradient: AxleColors.accentGradient,
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: [
-                BoxShadow(
-                  color: AxleColors.accent.withValues(alpha: 0.35),
-                  blurRadius: 20,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: const Icon(Icons.navigation_rounded,
-                color: AxleColors.bg, size: 26),
           ),
           const SizedBox(height: 24),
 
-          const Text(
-            'AXLETRACK',
-            style: TextStyle(
-              color: AxleColors.textPrimary,
-              fontWeight: FontWeight.w800,
-              fontSize: 28,
-              letterSpacing: 1.2,
-            ),
+          SvgPicture.asset(
+            'assets/images/lockup_horizontal.svg',
+            width: 260,
+            fit: BoxFit.contain,
           ),
           const SizedBox(height: 8),
           const Text(
@@ -441,9 +407,8 @@ class _LoginForm extends StatelessWidget {
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: isLoading ? null : AxleColors.accentGradient,
-                color: isLoading
-                    ? AxleColors.accent.withValues(alpha: 0.3)
-                    : null,
+                color:
+                    isLoading ? AxleColors.accent.withValues(alpha: 0.3) : null,
                 borderRadius: BorderRadius.circular(AxleRadius.lg),
                 boxShadow: isLoading
                     ? null
@@ -470,8 +435,7 @@ class _LoginForm extends StatelessWidget {
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation(AxleColors.bg),
+                          valueColor: AlwaysStoppedAnimation(AxleColors.bg),
                         ),
                       )
                     : const Text(

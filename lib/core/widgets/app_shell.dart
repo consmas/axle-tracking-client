@@ -94,8 +94,7 @@ class AppShell extends ConsumerWidget {
     final isMobile = MediaQuery.sizeOf(context).width < _kMobileBreakpoint;
     final authState = ref.watch(authControllerProvider);
     final userEmail = authState.user?.email ?? '';
-    final userInitial =
-        userEmail.isNotEmpty ? userEmail[0].toUpperCase() : 'A';
+    final userInitial = userEmail.isNotEmpty ? userEmail[0].toUpperCase() : 'A';
     final userName = userEmail.contains('@')
         ? userEmail.split('@').first
         : userEmail.isNotEmpty
@@ -115,8 +114,7 @@ class AppShell extends ConsumerWidget {
       location: location,
       userName: userName,
       userInitial: userInitial,
-      onLogout: () =>
-          ref.read(authControllerProvider.notifier).logout(),
+      onLogout: () => ref.read(authControllerProvider.notifier).logout(),
       child: child,
     );
   }
@@ -251,8 +249,7 @@ class _MobileAppBar extends StatelessWidget implements PreferredSizeWidget {
 
             // Connection status pill
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: AxleColors.accent.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(100),
@@ -353,11 +350,9 @@ class _MobileNavBar extends StatelessWidget {
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           iconTheme: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return const IconThemeData(
-                  color: AxleColors.accent, size: 22);
+              return const IconThemeData(color: AxleColors.accent, size: 22);
             }
-            return const IconThemeData(
-                color: AxleColors.textMuted, size: 22);
+            return const IconThemeData(color: AxleColors.textMuted, size: 22);
           }),
           labelTextStyle: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
@@ -442,47 +437,9 @@ class _DesktopShell extends StatelessWidget {
                   child: Row(
                     children: [
                       SvgPicture.asset(
-                        'assets/images/logo_mark.svg',
-                        width: 38,
-                        height: 38,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const Text(
-                                  'AXLE',
-                                  style: TextStyle(
-                                    color: AxleColors.textPrimary,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 13,
-                                    letterSpacing: 0.8,
-                                  ),
-                                ),
-                                const Text(
-                                  'TRACKING',
-                                  style: TextStyle(
-                                    color: AxleColors.accent,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 13,
-                                    letterSpacing: 0.8,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Text(
-                              'Fleet Intelligence',
-                              style: TextStyle(
-                                color: AxleColors.textMuted,
-                                fontSize: 10,
-                                letterSpacing: 0.2,
-                              ),
-                            ),
-                          ],
-                        ),
+                        'assets/images/lockup_horizontal.svg',
+                        width: 165,
+                        fit: BoxFit.contain,
                       ),
                     ],
                   ),
@@ -637,12 +594,10 @@ class _DesktopShell extends StatelessWidget {
                           vertical: 5,
                         ),
                         decoration: BoxDecoration(
-                          color:
-                              AxleColors.accent.withValues(alpha: 0.08),
+                          color: AxleColors.accent.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(100),
                           border: Border.all(
-                            color: AxleColors.accent
-                                .withValues(alpha: 0.2),
+                            color: AxleColors.accent.withValues(alpha: 0.2),
                           ),
                         ),
                         child: const Row(
@@ -839,9 +794,8 @@ class _SidebarTileState extends State<_SidebarTile> {
                               : _hovered
                                   ? AxleColors.textSecondary
                                   : AxleColors.textMuted,
-                          fontWeight: selected
-                              ? FontWeight.w700
-                              : FontWeight.w500,
+                          fontWeight:
+                              selected ? FontWeight.w700 : FontWeight.w500,
                           fontSize: 13,
                           letterSpacing: -0.1,
                         ),

@@ -30,10 +30,10 @@ static_sites:
     envs:
       - key: API_BASE_URL
         scope: BUILD_TIME
-        value: https://api.example.com
+        value: https://axle-track-api.consmas.com
       - key: GOOGLE_MAPS_API_KEY
         scope: BUILD_TIME
-        value: YOUR_PUBLIC_MAPS_KEY
+        value: AIzaSyBd9mAYtSqf58GEyOMYbvyEyL4R_VRxUOg
       - key: WEB_DIRECT_STREAM_ONLY
         scope: BUILD_TIME
         value: "true"

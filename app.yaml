@@ -3,7 +3,7 @@ name: axle-tracking
 static_sites:
   - name: web
     github:
-      repo: your-org/axle_tracking_cms
+      repo: consmas/axle-tracking-client
       branch: main
       deploy_on_push: true
     source_dir: /

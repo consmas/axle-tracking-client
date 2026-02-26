@@ -1,6 +1,8 @@
+import 'package:axle_tracking_cms/core/config/env.dart';
 import 'package:axle_tracking_cms/core/theme/design_system.dart';
-import 'package:axle_tracking_cms/core/utils/google_maps_web_loader.dart';
 import 'package:axle_tracking_cms/core/utils/date_time_utils.dart';
+import 'package:axle_tracking_cms/core/utils/google_maps_web_loader.dart';
+import 'package:axle_tracking_cms/core/utils/map_utils.dart';
 import 'package:axle_tracking_cms/core/widgets/axle_widgets.dart';
 import 'package:axle_tracking_cms/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:axle_tracking_cms/features/vehicles/presentation/providers/vehicles_providers.dart';
@@ -254,7 +256,7 @@ class _StatusMapCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final markerPosition = LatLng(latitude, longitude);
+    final markerPosition = normalizeVehicleLatLng(latitude, longitude);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -271,7 +273,8 @@ class _StatusMapCard extends StatelessWidget {
                         return const Center(child: CircularProgressIndicator());
                       }
                       if (snapshot.data != true) {
-                        return const _MapFallback();
+                        final missingKey = EnvConfig.googleMapsApiKey.isEmpty;
+                        return _MapFallback(missingKey: missingKey);
                       }
                       return _GoogleMapView(markerPosition: markerPosition);
                     },
@@ -298,6 +301,28 @@ class _StatusMapCard extends StatelessWidget {
   }
 }
 
+class _MapFallback extends StatelessWidget {
+  const _MapFallback({required this.missingKey});
+
+  final bool missingKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AxleColors.bgElevated,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(16),
+      child: Text(
+        missingKey
+            ? 'Google Maps key is missing.\nSet GOOGLE_MAPS_API_KEY in .env and restart app.'
+            : 'Google Maps JS failed to initialize.\nCheck key referrer restrictions for localhost/127.0.0.1.',
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: AxleColors.textSecondary),
+      ),
+    );
+  }
+}
+
 class _GoogleMapView extends StatelessWidget {
   const _GoogleMapView({required this.markerPosition});
 
@@ -307,6 +332,7 @@ class _GoogleMapView extends StatelessWidget {
   Widget build(BuildContext context) {
     return GoogleMap(
       initialCameraPosition: CameraPosition(target: markerPosition, zoom: 14),
+      style: kReadableRoadMapStyle,
       mapType: MapType.normal,
       compassEnabled: true,
       buildingsEnabled: true,
@@ -321,23 +347,6 @@ class _GoogleMapView extends StatelessWidget {
               BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
         ),
       },
-    );
-  }
-}
-
-class _MapFallback extends StatelessWidget {
-  const _MapFallback();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: AxleColors.bgElevated,
-      alignment: Alignment.center,
-      child: const Text(
-        'Map preview unavailable on web.\nCheck Google Maps web configuration.',
-        textAlign: TextAlign.center,
-        style: TextStyle(color: AxleColors.textSecondary),
-      ),
     );
   }
 }

@@ -32,8 +32,8 @@ Map<String, dynamic> _$$MapFeedVehicleImplToJson(
 
 _$MapFeedStatusImpl _$$MapFeedStatusImplFromJson(Map<String, dynamic> json) =>
     _$MapFeedStatusImpl(
-      latitude: _numToDouble(json['latitude']),
-      longitude: _numToDouble(json['longitude']),
+      latitude: _latitudeFromJson(json['latitude']),
+      longitude: _longitudeFromJson(json['longitude']),
       speedKmh: _numToDouble(json['speed_kmh']),
       updatedAt: _dateTimeFromJson(json['updatedAt']),
     );

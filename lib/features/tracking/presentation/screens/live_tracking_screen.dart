@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:axle_tracking_cms/core/config/env.dart';
 import 'package:axle_tracking_cms/core/theme/design_system.dart';
 import 'package:axle_tracking_cms/core/utils/google_maps_web_loader.dart';
+import 'package:axle_tracking_cms/core/utils/map_utils.dart';
 import 'package:axle_tracking_cms/core/utils/date_time_utils.dart';
 import 'package:axle_tracking_cms/core/widgets/axle_widgets.dart';
 import 'package:axle_tracking_cms/features/tracking/domain/entities/map_feed_vehicle.dart';
@@ -102,14 +103,19 @@ class _LiveTrackingScreenState extends ConsumerState<LiveTrackingScreen> {
     final selectedVehicle = _findVehicle(vehicles, selectedId);
     final markerPosition = selectedVehicle == null
         ? const LatLng(25.2048, 55.2708)
-        : LatLng(
-            selectedVehicle.status.latitude, selectedVehicle.status.longitude);
+        : normalizeVehicleLatLng(
+            selectedVehicle.status.latitude,
+            selectedVehicle.status.longitude,
+          );
 
     final markers = <Marker>{
       ...vehicles.map(
         (vehicle) => Marker(
           markerId: MarkerId('vehicle_${vehicle.id}'),
-          position: LatLng(vehicle.status.latitude, vehicle.status.longitude),
+          position: normalizeVehicleLatLng(
+            vehicle.status.latitude,
+            vehicle.status.longitude,
+          ),
           icon: BitmapDescriptor.defaultMarkerWithHue(
             vehicle.id == selectedId
                 ? BitmapDescriptor.hueGreen
@@ -673,6 +679,7 @@ class _MapSurface extends StatelessWidget {
           return GoogleMap(
             initialCameraPosition:
                 CameraPosition(target: markerPosition, zoom: 13.5),
+            style: kReadableRoadMapStyle,
             mapType: MapType.normal,
             compassEnabled: true,
             buildingsEnabled: true,
@@ -687,6 +694,7 @@ class _MapSurface extends StatelessWidget {
 
     return GoogleMap(
       initialCameraPosition: CameraPosition(target: markerPosition, zoom: 13.5),
+      style: kReadableRoadMapStyle,
       mapType: MapType.normal,
       compassEnabled: true,
       buildingsEnabled: true,

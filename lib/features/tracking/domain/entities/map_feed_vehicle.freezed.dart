@@ -322,9 +322,9 @@ MapFeedStatus _$MapFeedStatusFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$MapFeedStatus {
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _latitudeFromJson)
   double get latitude => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _longitudeFromJson)
   double get longitude => throw _privateConstructorUsedError;
   @JsonKey(name: 'speed_kmh', fromJson: _numToDouble)
   double get speedKmh => throw _privateConstructorUsedError;
@@ -348,8 +348,8 @@ abstract class $MapFeedStatusCopyWith<$Res> {
       _$MapFeedStatusCopyWithImpl<$Res, MapFeedStatus>;
   @useResult
   $Res call(
-      {@JsonKey(fromJson: _numToDouble) double latitude,
-      @JsonKey(fromJson: _numToDouble) double longitude,
+      {@JsonKey(fromJson: _latitudeFromJson) double latitude,
+      @JsonKey(fromJson: _longitudeFromJson) double longitude,
       @JsonKey(name: 'speed_kmh', fromJson: _numToDouble) double speedKmh,
       @JsonKey(fromJson: _dateTimeFromJson) DateTime updatedAt});
 }
@@ -404,8 +404,8 @@ abstract class _$$MapFeedStatusImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@JsonKey(fromJson: _numToDouble) double latitude,
-      @JsonKey(fromJson: _numToDouble) double longitude,
+      {@JsonKey(fromJson: _latitudeFromJson) double latitude,
+      @JsonKey(fromJson: _longitudeFromJson) double longitude,
       @JsonKey(name: 'speed_kmh', fromJson: _numToDouble) double speedKmh,
       @JsonKey(fromJson: _dateTimeFromJson) DateTime updatedAt});
 }
@@ -453,8 +453,8 @@ class __$$MapFeedStatusImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$MapFeedStatusImpl implements _MapFeedStatus {
   const _$MapFeedStatusImpl(
-      {@JsonKey(fromJson: _numToDouble) required this.latitude,
-      @JsonKey(fromJson: _numToDouble) required this.longitude,
+      {@JsonKey(fromJson: _latitudeFromJson) required this.latitude,
+      @JsonKey(fromJson: _longitudeFromJson) required this.longitude,
       @JsonKey(name: 'speed_kmh', fromJson: _numToDouble)
       required this.speedKmh,
       @JsonKey(fromJson: _dateTimeFromJson) required this.updatedAt});
@@ -463,10 +463,10 @@ class _$MapFeedStatusImpl implements _MapFeedStatus {
       _$$MapFeedStatusImplFromJson(json);
 
   @override
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _latitudeFromJson)
   final double latitude;
   @override
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _longitudeFromJson)
   final double longitude;
   @override
   @JsonKey(name: 'speed_kmh', fromJson: _numToDouble)
@@ -518,8 +518,8 @@ class _$MapFeedStatusImpl implements _MapFeedStatus {
 
 abstract class _MapFeedStatus implements MapFeedStatus {
   const factory _MapFeedStatus(
-      {@JsonKey(fromJson: _numToDouble) required final double latitude,
-      @JsonKey(fromJson: _numToDouble) required final double longitude,
+      {@JsonKey(fromJson: _latitudeFromJson) required final double latitude,
+      @JsonKey(fromJson: _longitudeFromJson) required final double longitude,
       @JsonKey(name: 'speed_kmh', fromJson: _numToDouble)
       required final double speedKmh,
       @JsonKey(fromJson: _dateTimeFromJson)
@@ -529,10 +529,10 @@ abstract class _MapFeedStatus implements MapFeedStatus {
       _$MapFeedStatusImpl.fromJson;
 
   @override
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _latitudeFromJson)
   double get latitude;
   @override
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _longitudeFromJson)
   double get longitude;
   @override
   @JsonKey(name: 'speed_kmh', fromJson: _numToDouble)

@@ -22,9 +22,9 @@ VehicleStatus _$VehicleStatusFromJson(Map<String, dynamic> json) {
 mixin _$VehicleStatus {
   @JsonKey(name: 'vehicle_id', fromJson: _idFromJson)
   String get vehicleId => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _latitudeFromJson)
   double get latitude => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _longitudeFromJson)
   double get longitude => throw _privateConstructorUsedError;
   @JsonKey(name: 'speed_kmh', fromJson: _numToDouble)
   double get speedKmh => throw _privateConstructorUsedError;
@@ -51,8 +51,8 @@ abstract class $VehicleStatusCopyWith<$Res> {
   @useResult
   $Res call(
       {@JsonKey(name: 'vehicle_id', fromJson: _idFromJson) String vehicleId,
-      @JsonKey(fromJson: _numToDouble) double latitude,
-      @JsonKey(fromJson: _numToDouble) double longitude,
+      @JsonKey(fromJson: _latitudeFromJson) double latitude,
+      @JsonKey(fromJson: _longitudeFromJson) double longitude,
       @JsonKey(name: 'speed_kmh', fromJson: _numToDouble) double speedKmh,
       @JsonKey(fromJson: _boolFromJson) bool online,
       @JsonKey(name: 'updated_at', fromJson: _dateTimeFromJson)
@@ -120,8 +120,8 @@ abstract class _$$VehicleStatusImplCopyWith<$Res>
   @useResult
   $Res call(
       {@JsonKey(name: 'vehicle_id', fromJson: _idFromJson) String vehicleId,
-      @JsonKey(fromJson: _numToDouble) double latitude,
-      @JsonKey(fromJson: _numToDouble) double longitude,
+      @JsonKey(fromJson: _latitudeFromJson) double latitude,
+      @JsonKey(fromJson: _longitudeFromJson) double longitude,
       @JsonKey(name: 'speed_kmh', fromJson: _numToDouble) double speedKmh,
       @JsonKey(fromJson: _boolFromJson) bool online,
       @JsonKey(name: 'updated_at', fromJson: _dateTimeFromJson)
@@ -183,8 +183,8 @@ class _$VehicleStatusImpl implements _VehicleStatus {
   const _$VehicleStatusImpl(
       {@JsonKey(name: 'vehicle_id', fromJson: _idFromJson)
       required this.vehicleId,
-      @JsonKey(fromJson: _numToDouble) required this.latitude,
-      @JsonKey(fromJson: _numToDouble) required this.longitude,
+      @JsonKey(fromJson: _latitudeFromJson) required this.latitude,
+      @JsonKey(fromJson: _longitudeFromJson) required this.longitude,
       @JsonKey(name: 'speed_kmh', fromJson: _numToDouble)
       required this.speedKmh,
       @JsonKey(fromJson: _boolFromJson) required this.online,
@@ -198,10 +198,10 @@ class _$VehicleStatusImpl implements _VehicleStatus {
   @JsonKey(name: 'vehicle_id', fromJson: _idFromJson)
   final String vehicleId;
   @override
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _latitudeFromJson)
   final double latitude;
   @override
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _longitudeFromJson)
   final double longitude;
   @override
   @JsonKey(name: 'speed_kmh', fromJson: _numToDouble)
@@ -261,8 +261,8 @@ abstract class _VehicleStatus implements VehicleStatus {
   const factory _VehicleStatus(
       {@JsonKey(name: 'vehicle_id', fromJson: _idFromJson)
       required final String vehicleId,
-      @JsonKey(fromJson: _numToDouble) required final double latitude,
-      @JsonKey(fromJson: _numToDouble) required final double longitude,
+      @JsonKey(fromJson: _latitudeFromJson) required final double latitude,
+      @JsonKey(fromJson: _longitudeFromJson) required final double longitude,
       @JsonKey(name: 'speed_kmh', fromJson: _numToDouble)
       required final double speedKmh,
       @JsonKey(fromJson: _boolFromJson) required final bool online,
@@ -276,10 +276,10 @@ abstract class _VehicleStatus implements VehicleStatus {
   @JsonKey(name: 'vehicle_id', fromJson: _idFromJson)
   String get vehicleId;
   @override
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _latitudeFromJson)
   double get latitude;
   @override
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _longitudeFromJson)
   double get longitude;
   @override
   @JsonKey(name: 'speed_kmh', fromJson: _numToDouble)

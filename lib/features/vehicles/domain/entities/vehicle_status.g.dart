@@ -9,8 +9,8 @@ part of 'vehicle_status.dart';
 _$VehicleStatusImpl _$$VehicleStatusImplFromJson(Map<String, dynamic> json) =>
     _$VehicleStatusImpl(
       vehicleId: _idFromJson(json['vehicle_id']),
-      latitude: _numToDouble(json['latitude']),
-      longitude: _numToDouble(json['longitude']),
+      latitude: _latitudeFromJson(json['latitude']),
+      longitude: _longitudeFromJson(json['longitude']),
       speedKmh: _numToDouble(json['speed_kmh']),
       online: _boolFromJson(json['online']),
       updatedAt: _dateTimeFromJson(json['updated_at']),

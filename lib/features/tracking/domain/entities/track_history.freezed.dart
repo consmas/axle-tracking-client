@@ -20,9 +20,9 @@ TrackPoint _$TrackPointFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$TrackPoint {
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _latitudeFromJson)
   double get latitude => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _longitudeFromJson)
   double get longitude => throw _privateConstructorUsedError;
   @JsonKey(name: 'speed_kmh', fromJson: _numToDouble)
   double get speedKmh => throw _privateConstructorUsedError;
@@ -46,8 +46,8 @@ abstract class $TrackPointCopyWith<$Res> {
       _$TrackPointCopyWithImpl<$Res, TrackPoint>;
   @useResult
   $Res call(
-      {@JsonKey(fromJson: _numToDouble) double latitude,
-      @JsonKey(fromJson: _numToDouble) double longitude,
+      {@JsonKey(fromJson: _latitudeFromJson) double latitude,
+      @JsonKey(fromJson: _longitudeFromJson) double longitude,
       @JsonKey(name: 'speed_kmh', fromJson: _numToDouble) double speedKmh,
       @JsonKey(name: 'recorded_at', fromJson: _dateTimeFromJson)
       DateTime recordedAt});
@@ -103,8 +103,8 @@ abstract class _$$TrackPointImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@JsonKey(fromJson: _numToDouble) double latitude,
-      @JsonKey(fromJson: _numToDouble) double longitude,
+      {@JsonKey(fromJson: _latitudeFromJson) double latitude,
+      @JsonKey(fromJson: _longitudeFromJson) double longitude,
       @JsonKey(name: 'speed_kmh', fromJson: _numToDouble) double speedKmh,
       @JsonKey(name: 'recorded_at', fromJson: _dateTimeFromJson)
       DateTime recordedAt});
@@ -153,8 +153,8 @@ class __$$TrackPointImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$TrackPointImpl implements _TrackPoint {
   const _$TrackPointImpl(
-      {@JsonKey(fromJson: _numToDouble) required this.latitude,
-      @JsonKey(fromJson: _numToDouble) required this.longitude,
+      {@JsonKey(fromJson: _latitudeFromJson) required this.latitude,
+      @JsonKey(fromJson: _longitudeFromJson) required this.longitude,
       @JsonKey(name: 'speed_kmh', fromJson: _numToDouble)
       required this.speedKmh,
       @JsonKey(name: 'recorded_at', fromJson: _dateTimeFromJson)
@@ -164,10 +164,10 @@ class _$TrackPointImpl implements _TrackPoint {
       _$$TrackPointImplFromJson(json);
 
   @override
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _latitudeFromJson)
   final double latitude;
   @override
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _longitudeFromJson)
   final double longitude;
   @override
   @JsonKey(name: 'speed_kmh', fromJson: _numToDouble)
@@ -219,8 +219,8 @@ class _$TrackPointImpl implements _TrackPoint {
 
 abstract class _TrackPoint implements TrackPoint {
   const factory _TrackPoint(
-      {@JsonKey(fromJson: _numToDouble) required final double latitude,
-      @JsonKey(fromJson: _numToDouble) required final double longitude,
+      {@JsonKey(fromJson: _latitudeFromJson) required final double latitude,
+      @JsonKey(fromJson: _longitudeFromJson) required final double longitude,
       @JsonKey(name: 'speed_kmh', fromJson: _numToDouble)
       required final double speedKmh,
       @JsonKey(name: 'recorded_at', fromJson: _dateTimeFromJson)
@@ -230,10 +230,10 @@ abstract class _TrackPoint implements TrackPoint {
       _$TrackPointImpl.fromJson;
 
   @override
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _latitudeFromJson)
   double get latitude;
   @override
-  @JsonKey(fromJson: _numToDouble)
+  @JsonKey(fromJson: _longitudeFromJson)
   double get longitude;
   @override
   @JsonKey(name: 'speed_kmh', fromJson: _numToDouble)

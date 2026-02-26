@@ -8,8 +8,8 @@ part of 'track_history.dart';
 
 _$TrackPointImpl _$$TrackPointImplFromJson(Map<String, dynamic> json) =>
     _$TrackPointImpl(
-      latitude: _numToDouble(json['latitude']),
-      longitude: _numToDouble(json['longitude']),
+      latitude: _latitudeFromJson(json['latitude']),
+      longitude: _longitudeFromJson(json['longitude']),
       speedKmh: _numToDouble(json['speed_kmh']),
       recordedAt: _dateTimeFromJson(json['recorded_at']),
     );

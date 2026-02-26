@@ -4,6 +4,7 @@ import 'package:axle_tracking_cms/core/config/env.dart';
 import 'package:axle_tracking_cms/core/theme/design_system.dart';
 import 'package:axle_tracking_cms/core/utils/date_time_utils.dart';
 import 'package:axle_tracking_cms/core/utils/google_maps_web_loader.dart';
+import 'package:axle_tracking_cms/core/utils/map_utils.dart';
 import 'package:axle_tracking_cms/core/widgets/axle_widgets.dart';
 import 'package:axle_tracking_cms/features/tracking/domain/entities/track_history.dart';
 import 'package:axle_tracking_cms/features/tracking/presentation/controllers/track_history_controller.dart';
@@ -556,7 +557,7 @@ class _PlaybackMap extends StatelessWidget {
     }
 
     final coordinates = points
-        .map((point) => LatLng(point.latitude, point.longitude))
+        .map((point) => normalizeVehicleLatLng(point.latitude, point.longitude))
         .toList(growable: false);
 
     final markerPosition = _positionAtProgress(points, progress);
@@ -590,6 +591,7 @@ class _PlaybackMap extends StatelessWidget {
                 return GoogleMap(
                   initialCameraPosition:
                       CameraPosition(target: markerPosition, zoom: 12),
+                  style: kReadableRoadMapStyle,
                   mapType: MapType.normal,
                   compassEnabled: true,
                   buildingsEnabled: true,
@@ -636,6 +638,7 @@ class _PlaybackMap extends StatelessWidget {
           : GoogleMap(
               initialCameraPosition:
                   CameraPosition(target: markerPosition, zoom: 12),
+              style: kReadableRoadMapStyle,
               mapType: MapType.normal,
               compassEnabled: true,
               buildingsEnabled: true,
@@ -682,7 +685,10 @@ class _PlaybackMap extends StatelessWidget {
 
   LatLng _positionAtProgress(List<TrackPoint> points, double progress) {
     if (points.length == 1) {
-      return LatLng(points.first.latitude, points.first.longitude);
+      return normalizeVehicleLatLng(
+        points.first.latitude,
+        points.first.longitude,
+      );
     }
 
     final scaled = progress.clamp(0, 1) * (points.length - 1);
@@ -695,7 +701,7 @@ class _PlaybackMap extends StatelessWidget {
 
     final lat = a.latitude + ((b.latitude - a.latitude) * t);
     final lng = a.longitude + ((b.longitude - a.longitude) * t);
-    return LatLng(lat, lng);
+    return normalizeVehicleLatLng(lat, lng);
   }
 
   List<LatLng> _playedPath(List<TrackPoint> points, double progress) {
@@ -705,7 +711,7 @@ class _PlaybackMap extends StatelessWidget {
     final index = scaled.floor();
     final path = points
         .take(index + 1)
-        .map((point) => LatLng(point.latitude, point.longitude))
+        .map((point) => normalizeVehicleLatLng(point.latitude, point.longitude))
         .toList(growable: true);
 
     path.add(_positionAtProgress(points, progress));

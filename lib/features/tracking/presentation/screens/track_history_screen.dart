@@ -590,20 +590,23 @@ class _PlaybackMap extends StatelessWidget {
                 return GoogleMap(
                   initialCameraPosition:
                       CameraPosition(target: markerPosition, zoom: 12),
+                  mapType: MapType.normal,
+                  compassEnabled: true,
+                  buildingsEnabled: true,
                   myLocationButtonEnabled: false,
-                  zoomControlsEnabled: false,
+                  zoomControlsEnabled: true,
                   mapToolbarEnabled: false,
                   polylines: {
                     Polyline(
                       polylineId: const PolylineId('full'),
-                      color: AxleColors.textMuted.withValues(alpha: 0.45),
-                      width: 4,
+                      color: AxleColors.textSecondary.withValues(alpha: 0.8),
+                      width: 5,
                       points: coordinates,
                     ),
                     Polyline(
                       polylineId: const PolylineId('played'),
                       color: AxleColors.accent,
-                      width: 5,
+                      width: 7,
                       points: playedCoordinates,
                     ),
                   },
@@ -633,20 +636,23 @@ class _PlaybackMap extends StatelessWidget {
           : GoogleMap(
               initialCameraPosition:
                   CameraPosition(target: markerPosition, zoom: 12),
+              mapType: MapType.normal,
+              compassEnabled: true,
+              buildingsEnabled: true,
               myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
+              zoomControlsEnabled: true,
               mapToolbarEnabled: false,
               polylines: {
                 Polyline(
                   polylineId: const PolylineId('full'),
-                  color: AxleColors.textMuted.withValues(alpha: 0.45),
-                  width: 4,
+                  color: AxleColors.textSecondary.withValues(alpha: 0.8),
+                  width: 5,
                   points: coordinates,
                 ),
                 Polyline(
                   polylineId: const PolylineId('played'),
                   color: AxleColors.accent,
-                  width: 5,
+                  width: 7,
                   points: playedCoordinates,
                 ),
               },

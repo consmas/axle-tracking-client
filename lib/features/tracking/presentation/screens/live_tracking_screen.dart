@@ -597,8 +597,8 @@ class _MapPanel extends StatelessWidget {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.transparent,
                                 shadowColor: Colors.transparent,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
                               ),
                             ),
                           ),
@@ -614,11 +614,11 @@ class _MapPanel extends StatelessWidget {
                             label: const Text('Video'),
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(
-                                  color: AxleColors.info
-                                      .withValues(alpha: 0.4)),
+                                  color:
+                                      AxleColors.info.withValues(alpha: 0.4)),
                               foregroundColor: AxleColors.info,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
                             ),
                           ),
                         ),
@@ -673,9 +673,12 @@ class _MapSurface extends StatelessWidget {
           return GoogleMap(
             initialCameraPosition:
                 CameraPosition(target: markerPosition, zoom: 13.5),
+            mapType: MapType.normal,
+            compassEnabled: true,
+            buildingsEnabled: true,
             markers: markers,
             myLocationButtonEnabled: false,
-            zoomControlsEnabled: false,
+            zoomControlsEnabled: true,
             mapToolbarEnabled: false,
           );
         },
@@ -684,9 +687,12 @@ class _MapSurface extends StatelessWidget {
 
     return GoogleMap(
       initialCameraPosition: CameraPosition(target: markerPosition, zoom: 13.5),
+      mapType: MapType.normal,
+      compassEnabled: true,
+      buildingsEnabled: true,
       markers: markers,
       myLocationButtonEnabled: false,
-      zoomControlsEnabled: false,
+      zoomControlsEnabled: true,
       mapToolbarEnabled: false,
     );
   }
@@ -707,8 +713,7 @@ class _MetaChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final valueColor =
-        highlight ? AxleColors.accent : AxleColors.textPrimary;
+    final valueColor = highlight ? AxleColors.accent : AxleColors.textPrimary;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(

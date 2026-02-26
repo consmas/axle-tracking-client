@@ -307,8 +307,11 @@ class _GoogleMapView extends StatelessWidget {
   Widget build(BuildContext context) {
     return GoogleMap(
       initialCameraPosition: CameraPosition(target: markerPosition, zoom: 14),
+      mapType: MapType.normal,
+      compassEnabled: true,
+      buildingsEnabled: true,
       myLocationButtonEnabled: false,
-      zoomControlsEnabled: false,
+      zoomControlsEnabled: true,
       mapToolbarEnabled: false,
       markers: {
         Marker(
